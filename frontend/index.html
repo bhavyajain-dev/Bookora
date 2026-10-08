@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookora - Discover & Book Cinema Tickets</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Editorial Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    
+    <!-- Main Styles -->
+    <link href="/css/styles.css" rel="stylesheet">
+    
+    <!-- Sign-In Modal Styles -->
+    <link href="/css/signin-modal.css" rel="stylesheet">
+    
+    <!-- Profile Completion Styles -->
+    <link href="/css/profile-completion-styles.css" rel="stylesheet">
+    
+    <style>
+        /* ==========================================
+           DESIGN SYSTEM - WARM LIGHT THEME
+           Editorial | Calm | Premium
+           ========================================== */
+        
+        :root {
+            /* Warm Light Color Palette */
+            --bg-primary: #faf8f5;
+            --bg-secondary: #f5f2ed;
+            --bg-tertiary: #f9f5f2;
+            --bg-card: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #2a2520;
+            --text-secondary: #6b6560;
+            --text-muted: #9c9590;
+            
+            /* Soft Pink Accents */
+            --accent-pink: #d4a59a;
+            --accent-pink-hover: #c28f83;
+            --accent-pink-soft: #e8cfc8;
+            --accent-pink-light: #f5e8e5;
+            
+            /* Warm Brown Tones */
+            --accent-brown: #a8826d;
+            --accent-beige: #d4c4b0;
+            
+            /* CTA Red (Book Now only) */
+            --cta-red: #b8463f;
+            --cta-red-hover: #9a3832;
+            
+            /* Borders & Shadows */
+            --border-light: #e8e3dc;
+            --border-pink: #e8d5cf;
+            --shadow-soft: rgba(42, 37, 32, 0.06);
+            --shadow-medium: rgba(42, 37, 32, 0.1);
+            --shadow-hover: rgba(212, 165, 154, 0.2);
+            --shadow-pink: rgba(212, 165, 154, 0.15);
+            
+            /* Background Depth - Subtle radial gradients */
+            --bg-gradient-warm: radial-gradient(ellipse 80% 50% at 20% 40%, rgba(245, 232, 229, 0.4) 0%, transparent 50%);
+            --bg-gradient-cool: radial-gradient(ellipse 60% 40% at 80% 60%, rgba(232, 227, 220, 0.3) 0%, transparent 50%);
+            
+            /* Typography */
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-accent: 'DM Serif Display', serif;
+            
+            /* Refined Transitions - Micro-interactions */
+            --transition-smooth: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-gentle: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.6, 1);
+            --transition-micro: all 0.15s ease-out;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            
+            /* Subtle background depth - barely visible warmth */
+            background-image: 
+                var(--bg-gradient-warm),
+                var(--bg-gradient-cool);
+            background-attachment: fixed;
+        }
+        
+        /* ==========================================
+           NAVBAR - LIGHT & MINIMAL
+           ========================================== */
+        
+        .navbar-bookora {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(250, 248, 245, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 2px 12px var(--shadow-soft);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        
+        .navbar-bookora.navbar-hidden {
+            transform: translateY(-100%);
+            box-shadow: none;
+        }
+
+        @media (min-width: 992px) {
+            .navbar-bookora.navbar-hidden {
+                transform: translateY(0) !important;
+            }
+        }
+        
+        .navbar-bookora .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--accent-pink);
+            letter-spacing: -0.5px;
+            font-family: var(--font-accent);
+            transition: var(--transition-micro);
+        }
+        
+        .navbar-bookora .navbar-brand:hover {
+            color: var(--accent-pink-hover);
+            transform: translateY(-1px);
+        }
+        
+        .navbar-bookora .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            margin: 0 1.2rem;
+            position: relative;
+            transition: var(--transition-micro);
+            font-size: 0.95rem;
+        }
+        
+        .navbar-bookora .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--accent-pink);
+            transition: var(--transition-gentle);
+            border-radius: 2px;
+        }
+        
+        .navbar-bookora .nav-link:hover {
+            color: var(--accent-pink-hover) !important;
+        }
+        
+        .navbar-bookora .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        .city-display {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 1px 3px var(--shadow-soft);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .city-display i {
+            color: var(--accent-pink);
+            margin-right: 0.5rem;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .btn-login {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+            padding: 0.55rem 1.3rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-micro);
+            font-size: 0.9rem;
+        }
+        
+        .btn-login:hover {
+            background: var(--accent-pink-light);
+            border-color: var(--accent-pink-soft);
+            color: var(--accent-pink-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-signup {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 0.55rem 1.3rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-micro);
+            font-size: 0.9rem;
+        }
+        
+        .btn-signup:hover {
+            background: var(--accent-pink-hover);
+            box-shadow: 0 4px 16px var(--shadow-pink);
+            transform: translateY(-2px);
+        }
+        
+        /* ==========================================
+           HERO SECTION - CURSOR-DRIVEN INTERACTION
+           NO CAROUSEL | NO AUTOPLAY
+           Warmer background for section contrast
+           ========================================== */
+        
+        .hero-section {
+            margin-top: 75px;
+            min-height: 600px;
+            position: relative;
+            padding: 4rem 0 6rem;
+            overflow: hidden;
+            
+            /* Warmer hero background with subtle depth */
+            background: 
+                radial-gradient(ellipse 100% 80% at 50% 100%, rgba(245, 232, 229, 0.5) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 30% 20%, rgba(248, 240, 236, 0.4) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+        }
+        
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .hero-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-title h1 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        
+        .hero-title p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            opacity: 0.8;
+            transition: var(--transition-gentle);
+        }
+        
+        .banners-wrapper:hover ~ .hero-title p,
+        .hero-title:hover p {
+            opacity: 1;
+            color: var(--accent-pink-hover);
+        }
+        
+        /* Movie Banners Stack Container */
+        .banners-wrapper {
+            position: relative;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            cursor: crosshair;
+        }
+        
+        .banners-stack {
+            position: relative;
+            width: 100%;
+            max-width: 1300px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+        
+        /**
+         * CONTINUOUS INTERPOLATION MODEL
+         * ================================
+         * NO .active class - transforms are applied via JS
+         * Each banner receives calculated values based on cursor distance
+         * All banners update simultaneously on every mousemove
+         */
+        .movie-banner {
+            position: absolute;
+            width: 320px;
+            height: 420px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--bg-card);
+            box-shadow: 0 6px 24px var(--shadow-soft);
+            
+            /* NO CSS transition - JS handles smooth interpolation */
+            /* This allows for fluid, continuous updates */
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-origin: center center;
+        }
+        
+        /**
+         * Base positioning - evenly distributed horizontally
+         * JavaScript will override transforms based on cursor
+         */
+        .movie-banner:nth-child(1) { left: calc(10% - 160px); }
+        .movie-banner:nth-child(2) { left: calc(30% - 160px); }
+        .movie-banner:nth-child(3) { left: calc(50% - 160px); }
+        .movie-banner:nth-child(4) { left: calc(70% - 160px); }
+        .movie-banner:nth-child(5) { left: calc(90% - 160px); }
+        
+        /* Remove all hover and active class styles - JS controls everything */
+        
+        .banner-image {
+            width: 100%;
+            height: 62%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .banner-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, rgba(255,255,255,0.95), transparent);
+        }
+        
+        .banner-content {
+            padding: 1.5rem;
+            background: white;
+            height: 35%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .banner-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        
+        .banner-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .btn-book {
+            background: var(--cta-red);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-micro);
+            align-self: flex-start;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 8px rgba(184, 70, 63, 0.15);
+        }
+        
+        .btn-book:hover {
+            background: var(--cta-red-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(184, 70, 63, 0.25);
+        }
+        
+        .btn-book:active {
+            transform: translateY(-1px);
+        }
+        
+        /* ==========================================
+           FILTER BAR - CLEAN & SUBTLE
+           ========================================== */
+        
+        .filter-bar {
+            background: var(--bg-card);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .filter-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            padding: 0 2rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-group select {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            min-width: 150px;
+        }
+        
+        .filter-group select:hover {
+            border-color: var(--accent-pink-soft);
+            transform: translateY(-1px);
+        }
+        
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 0 3px var(--accent-pink-light);
+        }
+        
+        /* ==========================================
+           MOVIE SECTIONS - HORIZONTAL SCROLL
+           ========================================== */
+        
+        .content-section {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: 
+                radial-gradient(ellipse 120% 60% at 50% 0%, rgba(250, 248, 245, 0.9) 0%, transparent 70%),
+                radial-gradient(ellipse 80% 40% at 80% 80%, rgba(240, 238, 235, 0.4) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        
+        .movie-section {
+            margin-bottom: 4rem;
+        }
+        
+        .section-header {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .section-header i {
+            font-size: 1.5rem;
+            transition: var(--transition-micro);
+        }
+        
+        .movie-section:hover .section-header i {
+            transform: scale(1.1);
+        }
+        
+        .movies-scroll-wrapper {
+            position: relative;
+        }
+        
+        .movies-container {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 1rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-soft) var(--bg-secondary);
+        }
+        
+        .movies-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .movies-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+        }
+        
+        .movies-container::-webkit-scrollbar-thumb {
+            background: var(--accent-soft);
+            border-radius: 10px;
+        }
+        
+        .movie-card {
+            flex: 0 0 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition-gentle);
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 12px var(--shadow-soft);
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px var(--shadow-pink);
+            border-color: var(--border-pink);
+        }
+        
+        .movie-poster {
+            width: 100%;
+            height: 280px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .rating-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 2px 8px var(--shadow-soft);
+            backdrop-filter: blur(8px);
+            transition: var(--transition-micro);
+        }
+        
+        .rating-badge i {
+            color: var(--accent-pink);
+        }
+        
+        .movie-card:hover .rating-badge {
+            transform: scale(1.05);
+        }
+        
+        .movie-info {
+            padding: 1.2rem;
+        }
+        
+        .movie-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-family: var(--font-display);
+        }
+        
+        .movie-language {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 45px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition-micro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px var(--shadow-soft);
+        }
+        
+        .scroll-arrow:hover {
+            background: var(--accent-pink);
+            color: white;
+            border-color: var(--accent-pink);
+            transform: translateY(-50%) scale(1.08);
+        }
+        
+        .scroll-arrow.left { left: -20px; }
+        .scroll-arrow.right { right: -20px; }
+        
+        /* ==========================================
+           PROMOTIONAL STRIP - WARM & SUBTLE
+           ========================================== */
+        
+        .promo-strip {
+            background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-pink-hover) 100%);
+            padding: 3rem;
+            margin: 3rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px var(--shadow-pink);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .promo-strip::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .promo-title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .promo-description {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+        
+        .promo-code {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            margin-top: 0.5rem;
+        }
+        
+        .btn-promo {
+            background: white;
+            color: var(--accent-pink-hover);
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: var(--transition-micro);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-promo:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* ==========================================
+           FOOTER - MINIMAL & PROFESSIONAL
+           ========================================== */
+        
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 3rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            font-family: var(--font-display);
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-section ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        
+        .footer-section ul li a:hover {
+            color: var(--accent-primary);
+        }
+        
+        .footer-about {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-micro);
+        }
+        
+        .social-icon:hover {
+            background: var(--accent-pink);
+            color: white;
+            border-color: var(--accent-pink);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid var(--border-light);
+            padding-top: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* ==========================================
+           RESPONSIVE DESIGN
+
+           NOTE: this page carries its own copy of the
+           design system above, which shadows
+           static/styles.css. The breakpoints below
+           mirror the shared ones in styles.css for the
+           selectors that copy declares.
+
+           Breakpoints:
+             >= 1200px   desktop (base rules above)
+             992-1199px  small desktop
+             768-991px   tablet - hero becomes a swipe row
+             576-767px   large phone
+             <= 575px    phone, down to 320px
+           ========================================== */
+
+        /* Fluid banner text: long titles no longer clip the card */
+        .banner-image {
+            height: 58%;
+        }
+
+        .banner-content {
+            height: 42%;
+            overflow: hidden;
+            padding: clamp(0.9rem, 1.1vw, 1.5rem);
+        }
+
+        .banner-title {
+            font-size: clamp(1.05rem, 0.55vw + 0.75rem, 1.4rem);
+            margin-bottom: 0.35rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .banner-subtitle {
+            font-size: clamp(0.72rem, 0.25vw + 0.6rem, 0.85rem);
+            margin-bottom: 0.6rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Cursor-driven hero: fluid width + spread so the
+           outer banners never spill out of the wrapper */
+        @media (min-width: 992px) {
+            .banners-stack {
+                --banner-w: clamp(260px, 20vw, 320px);
+                --banner-spread: clamp(150px, 16.5vw, 250px);
+            }
+
+            .movie-banner {
+                width: var(--banner-w);
+                height: calc(var(--banner-w) * 1.3125);
+            }
+
+            .movie-banner:nth-child(1) { left: calc(50% - var(--banner-w) / 2 - var(--banner-spread) * 2); }
+            .movie-banner:nth-child(2) { left: calc(50% - var(--banner-w) / 2 - var(--banner-spread)); }
+            .movie-banner:nth-child(3) { left: calc(50% - var(--banner-w) / 2); }
+            .movie-banner:nth-child(4) { left: calc(50% - var(--banner-w) / 2 + var(--banner-spread)); }
+            .movie-banner:nth-child(5) { left: calc(50% - var(--banner-w) / 2 + var(--banner-spread) * 2); }
+
+            .banners-wrapper {
+                height: calc(clamp(260px, 20vw, 320px) * 1.3125 + 40px);
+            }
+        }
+
+        @media (max-width: 1199.98px) {
+            .movie-poster {
+                height: 250px;
+            }
+
+            .hero-title h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Tablet - a cursor hero is meaningless on touch,
+           so the banners become a horizontal swipe row */
+        @media (max-width: 991.98px) {
+            .hero-section {
+                margin-top: 68px;
+                min-height: 0;
+                padding: 2.5rem 0 3.5rem;
+            }
+
+            .hero-container {
+                padding: 0 1.5rem;
+            }
+
+            .hero-title {
+                margin-bottom: 2rem;
+            }
+
+            .hero-title h1 {
+                font-size: 2.25rem;
+            }
+
+            .banners-wrapper {
+                height: auto;
+                display: block;
+                perspective: none;
+                cursor: default;
+                margin: 0 -1.5rem;
+            }
+
+            .banners-stack {
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: flex-start;
+                height: auto;
+                max-width: none;
+                gap: 1rem;
+                padding: 0.5rem 1.5rem 1.5rem;
+                overflow-x: auto;
+                overflow-y: hidden;
+                transform-style: flat;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .banners-stack::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* !important: the hero script writes inline
+               transform/filter/shadow for the desktop
+               interaction; below 992px it must not apply. */
+            .movie-banner {
+                position: relative;
+                left: auto !important;
+                right: auto !important;
+                flex: 0 0 72%;
+                width: auto;
+                max-width: 300px;
+                height: 400px;
+                margin: 0;
+                scroll-snap-align: center;
+                transform: none !important;
+                filter: none !important;
+                opacity: 1 !important;
+                box-shadow: 0 6px 24px var(--shadow-soft) !important;
+            }
+
+            .content-section {
+                padding: 3rem 1.5rem;
+            }
+
+            .movie-section {
+                margin-bottom: 3rem;
+            }
+
+            /* Posters keep their 2:3 ratio instead of a fixed height */
+            .movie-poster {
+                height: auto;
+                aspect-ratio: 2 / 3;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-container {
+                padding: 0 1rem;
+            }
+
+            .hero-title h1 {
+                font-size: 1.85rem;
+                letter-spacing: -0.5px;
+            }
+
+            .hero-title p {
+                font-size: 0.95rem;
+            }
+
+            .banners-wrapper {
+                margin: 0 -1rem;
+            }
+
+            .banners-stack {
+                gap: 0.85rem;
+                padding: 0.5rem 1rem 1.25rem;
+            }
+
+            .movie-banner {
+                flex: 0 0 78%;
+                height: 370px;
+            }
+
+            .filter-content {
+                flex-direction: column;
+                padding: 0 1rem;
+            }
+
+            .filter-group,
+            .filter-group select {
+                width: 100%;
+            }
+
+            .content-section {
+                padding: 2.5rem 1rem;
+            }
+
+            .movie-section {
+                margin-bottom: 2.5rem;
+            }
+
+            .promo-strip {
+                padding: 2rem 1.25rem;
+                margin: 2rem 1rem;
+            }
+
+            .promo-title {
+                font-size: 1.5rem;
+            }
+
+            .promo-description {
+                font-size: 0.95rem;
+            }
+
+            .promo-code {
+                font-size: 1.05rem;
+                padding: 0.7rem 1.25rem;
+                letter-spacing: 0.5px;
+            }
+
+            .footer {
+                padding: 2.5rem 1.25rem 1.5rem;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.75rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero-title h1 {
+                font-size: 1.6rem;
+            }
+
+            .movie-banner {
+                flex: 0 0 84%;
+                height: 340px;
+            }
+
+            .content-section {
+                padding: 2rem 0.75rem;
+            }
+
+            .movie-info {
+                padding: 0.85rem;
+            }
+
+            .movie-title {
+                font-size: 0.9rem;
+            }
+
+            .movie-language {
+                font-size: 0.75rem;
+            }
+
+            .promo-strip {
+                padding: 1.75rem 1rem;
+                margin: 1.5rem 0.75rem;
+            }
+
+            .promo-code {
+                font-size: 0.95rem;
+                padding: 0.6rem 1rem;
+                word-break: break-word;
+            }
+
+            .footer {
+                padding: 2rem 1rem 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bookora Branded Initial Splash Loader -->
+    <div id="appSplashLoader" class="bookora-splash-loader" aria-live="polite" aria-busy="true">
+        <div class="splash-content">
+            <div class="splash-logo">BOOKORA</div>
+            <div class="splash-progress-bar"></div>
+            <p class="splash-subtitle">Loading your cinema experience...</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         NAVBAR - LIGHT & STICKY
+         ========================================== -->
+    
+    <nav class="navbar navbar-expand-lg navbar-bookora">
+        <div class="container-fluid" style="padding: 0 2rem;">
+            <a class="navbar-brand" href="/" onclick="navigateToHome(event)">Bookora</a>
+            
+            <button class="navbar-toggler" type="button" aria-controls="navbarContent" aria-expanded="false" aria-label="Open navigation">
+                <i class="fas fa-bars navbar-toggler-open"></i>
+                <i class="fas fa-times navbar-toggler-close"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#movies" onclick="navigateToSection('movies', event)">
+                            <i class="fas fa-film nav-icon"></i>
+                            <span>Movies</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="openEventsModal(event)">
+                            <i class="fas fa-calendar-alt nav-icon"></i>
+                            <span>Events</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="openOffersModal(event)">
+                            <i class="fas fa-tags nav-icon"></i>
+                            <span>Offers</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mobile-menu-divider"></div>
+                
+                <div class="city-display">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Ahmedabad, Gujarat</span>
+                </div>
+                
+                <div class="mobile-menu-divider"></div>
+                
+                <!-- Auth State Container: shows login button OR profile dropdown -->
+                <div id="authContainer" style="margin-left: 1.5rem;">
+                    <!-- Logged Out State -->
+                    <div id="loggedOutState" class="auth-buttons">
+                        <button class="btn-signup" onclick="openSignInModal()">Login / Signup</button>
+                    </div>
+                    
+                    <!-- Logged In State -->
+                    <div id="loggedInState" class="profile-container" style="display: none;">
+                        <div class="profile-avatar" onclick="toggleProfileDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        
+                        <!-- Profile Dropdown -->
+                        <div id="profileDropdown" class="profile-dropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="profile-name" id="profileDisplayName">User Name</div>
+                                <div class="profile-contact" id="profileDisplayContact">user@email.com</div>
+                            </div>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToProfile(event)">
+                                <i class="fas fa-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToBookings(event)">
+                                <i class="fas fa-ticket-alt"></i>
+                                <span>My Bookings</span>
+                            </a>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToSavedMovies(event)">
+                                <i class="fas fa-heart"></i>
+                                <span>Saved Movies</span>
+                            </a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="#" class="profile-dropdown-item logout-item" onclick="handleLogout(event)">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- ==========================================
+         SIGN-IN MODAL
+         ========================================== -->
+    
+    <div class="modal-overlay" id="signinModal">
+        <div class="signin-modal">
+            <button class="modal-close" onclick="closeSignInModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <h2>Welcome to Bookora</h2>
+                <p>Choose your preferred sign-in method</p>
+            </div>
+            
+            <div class="auth-options">
+                <button class="auth-option-btn" onclick="selectAuthMethod('Email')">
+                    <i class="fas fa-envelope"></i>
+                    <span>Continue with Email</span>
+                </button>
+            </div>
+            
+            <div class="modal-footer">
+                By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         HERO SECTION - CURSOR-DRIVEN INTERACTION
+         NO CAROUSEL | Mouse controls focus
+         ========================================== -->
+    
+    <section class="hero-section" id="hero">
+        <div class="hero-container">
+            <div class="hero-title">
+                <h1>Discover Cinema</h1>
+                <p>Gently move your cursor to explore films</p>
+            </div>
+            
+            <!-- 
+                CONTINUOUS INTERPOLATION MODEL:
+                - Mouse X position maps to a focus index (0-4, float)
+                - ALL banners update simultaneously on every mousemove
+                - Distance from focus determines: scale, Y, Z, opacity, blur
+                - Uses requestAnimationFrame for smooth 60fps updates
+                - NO hover logic, NO active class - pure position-based math
+            -->
+            <div class="banners-wrapper" id="bannersWrapper">
+                <div class="banners-stack" id="bannersStack">
+                    <!-- Hero banners are loaded dynamically from production movies API -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==========================================
+         MOVIE SECTIONS - HORIZONTAL SCROLL
+         ========================================== -->
+    
+    <main class="content-section" id="movies">
+        
+        <!-- Section 1: Recommended -->
+        <section class="movie-section">
+            <div class="section-header-row">
+                <h3 class="section-title">
+                    <i class="fas fa-heart" style="color: var(--accent-pink);"></i>
+                    Recommended for You
+                </h3>
+                <div class="section-navigation">
+                    <button class="nav-arrow left" onclick="navigateSection('recommended', 'prev')">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-arrow right" onclick="navigateSection('recommended', 'next')">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="movies-grid" id="recommended-grid">
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+            </div>
+        </section>
+
+        <!-- Section 2: New Releases -->
+        <section class="movie-section">
+            <div class="section-header-row">
+                <h3 class="section-title">
+                    <i class="fas fa-clapperboard" style="color: var(--accent-pink-soft);"></i>
+                    New Releases
+                </h3>
+                <div class="section-navigation">
+                    <button class="nav-arrow left" onclick="navigateSection('new-releases', 'prev')">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-arrow right" onclick="navigateSection('new-releases', 'next')">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="movies-grid" id="new-releases-grid">
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+            </div>
+        </section>
+
+        <!-- Section 3: Top Rated -->
+        <section class="movie-section">
+            <div class="section-header-row">
+                <h3 class="section-title">
+                    <i class="fas fa-crown" style="color: var(--accent-brown);"></i>
+                    Top Rated
+                </h3>
+                <div class="section-navigation">
+                    <button class="nav-arrow left" onclick="navigateSection('top-rated', 'prev')">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-arrow right" onclick="navigateSection('top-rated', 'next')">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="movies-grid" id="top-rated-grid">
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+                <div class="movie-card bookora-skeleton-card"><div class="movie-poster bookora-skeleton-poster"></div><div class="movie-info"><div class="bookora-skeleton" style="height: 18px; width: 75%; margin-bottom: 6px;"></div><div class="bookora-skeleton" style="height: 14px; width: 50%;"></div></div></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         EVENTS MODAL - COMING SOON
+         ========================================== -->
+    
+    <div id="eventsModal" class="events-modal" onclick="closeEventsModal(event)">
+        <div class="events-modal-content" onclick="event.stopPropagation()">
+            <button class="events-modal-close" onclick="closeEventsModal(event)">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="events-modal-icon">
+                <i class="fas fa-calendar-star"></i>
+            </div>
+            <h3 class="events-modal-title">Coming Soon</h3>
+            <p class="events-modal-text">Events & live shows will be added to Bookora soon. Stay tuned.</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         OFFERS MODAL - COMING SOON
+         ========================================== -->
+    
+    <div id="offersModal" class="events-modal" onclick="closeOffersModal(event)">
+        <div class="events-modal-content" onclick="event.stopPropagation()">
+            <button class="events-modal-close" onclick="closeOffersModal(event)">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="events-modal-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            <h3 class="events-modal-title">Exciting Offers Coming Soon!</h3>
+            <p class="events-modal-text">We're working on exclusive deals and special discounts for Bookora users. Stay tuned for exciting offers coming your way.</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PROMOTIONAL STRIP
+         ========================================== -->
+    
+    <section id="offers">
+        <div class="promo-strip">
+            <h4 class="promo-title">Festival Bonanza Sale</h4>
+            <p class="promo-description">Book your movie tickets now and get up to 50% off on select shows</p>
+            <div class="promo-code">FESTIVAL2026</div>
+            <br>
+            <button class="btn-promo" onclick="openOffersModal(event)">Explore Offers</button>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER - MINIMAL & PROFESSIONAL
+         ========================================== -->
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>About Bookora</h4>
+                <div class="footer-about">
+                    <p>Bookora is your ultimate platform for discovering and booking cinema tickets. Experience movies like never before.</p>
+                    <div class="social-icons">
+                        <a class="social-icon" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="social-icon" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="social-icon" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="social-icon" href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Help & Support</h4>
+                <ul>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#support">Support</a></li>
+                    <li><a href="#feedback">Feedback</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Policies</h4>
+                <ul>
+                    <li><a href="#terms">Terms & Conditions</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#cancellation">Cancellation</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#movies">Browse Movies</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#offers">Offers</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bookora. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         JAVASCRIPT - CURSOR-DRIVEN INTERACTION
+         ========================================== -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        /**
+         * ==========================================
+         * CONTINUOUS CURSOR-DRIVEN INTERPOLATION
+         * ==========================================
+         * 
+         * THIS IS NOT HOVER-BASED ANIMATION.
+         * This is continuous position-based interpolation.
+         * 
+         * HOW IT WORKS:
+         * 1. Track mouse X position continuously via mousemove
+         * 2. Normalize position to 0 → 1 range
+         * 3. Map normalized value to a "focus index" (float, not int)
+         * 4. Each banner calculates its distance from focus
+         * 5. Distance determines: scale, translateY, translateZ, opacity, z-index
+         * 6. ALL banners update on EVERY mouse movement
+         * 7. Use requestAnimationFrame for smooth 60fps updates
+         * 
+         * VISUAL RESULT:
+         * - Banners feel layered in depth
+         * - Banner nearest cursor rises forward
+         * - Neighboring banners react proportionally
+         * - Distant banners react minimally
+         * - Motion is smooth, slow, restrained
+         */
+        
+        // ===========================================
+        // CONFIGURATION - Tweak these for feel
+        // ===========================================
+        const CONFIG = {
+            // Transform values
+            maxScale: 1.0,          // Scale of focused banner
+            minScale: 0.92,         // Scale of distant banners
+            maxLift: -24,           // Y translation of focused (negative = up)
+            minLift: 18,            // Y translation of distant (positive = down)
+            maxZ: 90,               // Z translation of focused
+            minZ: -40,              // Z translation of distant
+            
+            // Visual effects
+            maxBlur: 0,             // Blur of focused (sharp)
+            minBlur: 1.5,           // Blur of distant (subtle soft-focus)
+            
+            // Easing (lower = smoother/slower)
+            lerpFactor: 0.24,       // Interpolation speed (SageKit-snappy)
+            
+            // Shadow
+            baseShadow: 'rgba(212, 165, 154, 0.15)',
+            focusShadow: 'rgba(212, 165, 154, 0.35)'
+        };
+        
+        // ===========================================
+        // STATE
+        // ===========================================
+        const bannersWrapper = document.getElementById('bannersWrapper');
+        let banners = []; // Will be queried dynamically
+        let numBanners = 0;
+        
+        // Current interpolated values for each banner
+        let bannerStates = [];
+        
+        // Target focus index (float) - where the cursor is pointing
+        let targetFocusIndex = 2; // Start at center
+        let currentFocusIndex = 2;
+        
+        // Animation state
+        let isAnimating = false;
+        let mouseInside = false;
+        
+        // ===========================================
+        // MATH UTILITIES
+        // ===========================================
+        
+        /**
+         * Linear interpolation
+         * @param {number} start - Starting value
+         * @param {number} end - Target value
+         * @param {number} t - Interpolation factor (0-1)
+         */
+        function lerp(start, end, t) {
+            return start + (end - start) * t;
+        }
+        
+        /**
+         * Clamp value between min and max
+         */
+        function clamp(value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+        
+        /**
+         * Map a value from one range to another
+         * @param {number} value - Input value
+         * @param {number} inMin - Input range minimum
+         * @param {number} inMax - Input range maximum
+         * @param {number} outMin - Output range minimum
+         * @param {number} outMax - Output range maximum
+         */
+        function mapRange(value, inMin, inMax, outMin, outMax) {
+            return outMin + (outMax - outMin) * ((value - inMin) / (inMax - inMin));
+        }
+        
+        // ===========================================
+        // CORE: Calculate banner transforms based on distance
+        // ===========================================
+        
+        /**
+         * Calculate all visual properties for a banner based on its distance from focus
+         * 
+         * @param {number} bannerIndex - Index of the banner (0-4)
+         * @param {number} focusIndex - Current focus position (float, e.g., 2.3)
+         * @returns {Object} - Object with scale, translateY, translateZ, opacity, etc.
+         * 
+         * HOW DISTANCE IS CALCULATED:
+         * - distance = |bannerIndex - focusIndex|
+         * - distance = 0 means banner is perfectly focused
+         * - distance = 1 means banner is one position away
+         * - We use this to interpolate between min/max values
+         */
+        function calculateBannerState(bannerIndex, focusIndex) {
+            // Calculate absolute distance from focus point
+            const distance = Math.abs(bannerIndex - focusIndex);
+            
+            // Normalize distance (0 = focused, 1+ = far)
+            // We use a max distance of 2 for normalization
+            const normalizedDistance = clamp(distance / 2, 0, 1);
+            
+            // Calculate each property based on distance
+            // Closer = higher scale, lower Y, higher Z, full opacity
+            // Farther = lower scale, higher Y, lower Z, reduced opacity
+            
+            return {
+                // Scale: 1.0 when focused, 0.92 when far
+                scale: lerp(CONFIG.maxScale, CONFIG.minScale, normalizedDistance),
+                
+                // Y translation: -24 (up) when focused, +18 (down) when far
+                translateY: lerp(CONFIG.maxLift, CONFIG.minLift, normalizedDistance),
+                
+                // Z translation: +90 (forward) when focused, -40 (back) when far
+                translateZ: lerp(CONFIG.maxZ, CONFIG.minZ, normalizedDistance),
+                
+                // Blur: 0px when focused (sharp), 4px when far (blurred)
+                blur: lerp(CONFIG.maxBlur, CONFIG.minBlur, normalizedDistance),
+                
+                // Z-index: higher when closer to focus
+                zIndex: Math.round(100 - distance * 20)
+            };
+        }
+        
+        // ===========================================
+        // APPLY TRANSFORMS TO DOM
+        // ===========================================
+        
+        /**
+         * Apply calculated states to banner elements
+         * Called every animation frame
+         */
+        function applyBannerTransforms() {
+            banners.forEach((banner, index) => {
+                const state = bannerStates[index];
+                
+                // Build transform string
+                const transform = `
+                    scale(${state.scale.toFixed(4)})
+                    translateY(${state.translateY.toFixed(2)}px)
+                    translateZ(${state.translateZ.toFixed(2)}px)
+                `;
+                
+                // Build filter - focused banner = sharp, others = blurred
+                const filter = `blur(${state.blur.toFixed(2)}px)`;
+                
+                // Calculate shadow based on scale (depth cue)
+                const shadowIntensity = mapRange(state.scale, CONFIG.minScale, CONFIG.maxScale, 0.08, 0.35);
+                const shadowBlur = mapRange(state.scale, CONFIG.minScale, CONFIG.maxScale, 20, 48);
+                const boxShadow = `0 ${8 + state.translateZ * 0.1}px ${shadowBlur}px rgba(0, 0, 0, ${shadowIntensity})`;
+                
+                // Apply to element
+                banner.style.transform = transform;
+                banner.style.opacity = '1';
+                banner.style.filter = filter;
+                banner.style.zIndex = state.zIndex;
+                banner.style.boxShadow = boxShadow;
+            });
+        }
+        
+        // ===========================================
+        // ANIMATION LOOP
+        // ===========================================
+        
+        /**
+         * Main animation loop using requestAnimationFrame
+         * Smoothly interpolates current values toward target values
+         */
+        function animate() {
+            // Smoothly interpolate focus index toward target
+            currentFocusIndex = lerp(currentFocusIndex, targetFocusIndex, CONFIG.lerpFactor);
+            
+            // Calculate and interpolate each banner's state
+            banners.forEach((banner, index) => {
+                // Calculate target state based on current focus
+                const targetState = calculateBannerState(index, currentFocusIndex);
+                
+                // Smoothly interpolate current state toward target
+                bannerStates[index].scale = lerp(bannerStates[index].scale, targetState.scale, CONFIG.lerpFactor);
+                bannerStates[index].translateY = lerp(bannerStates[index].translateY, targetState.translateY, CONFIG.lerpFactor);
+                bannerStates[index].translateZ = lerp(bannerStates[index].translateZ, targetState.translateZ, CONFIG.lerpFactor);
+                bannerStates[index].blur = lerp(bannerStates[index].blur, targetState.blur, CONFIG.lerpFactor);
+                bannerStates[index].zIndex = targetState.zIndex;
+            });
+            
+            // Apply transforms to DOM
+            applyBannerTransforms();
+            
+            // Continue animation loop
+            if (isAnimating) {
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        /**
+         * Start animation loop if not already running
+         */
+        function startAnimation() {
+            if (!isAnimating) {
+                isAnimating = true;
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        // ===========================================
+        // MOUSE EVENT HANDLERS
+        // ===========================================
+        
+        /**
+         * Handle mouse movement - THIS IS THE CORE INTERACTION
+         * 
+         * Maps cursor X position to focus index:
+         * - Left edge (0%) → focus on banner 0
+         * - Right edge (100%) → focus on banner 4
+         * - Anywhere in between → proportional float value
+         */
+        function handleMouseMove(e) {
+            // Desktop only. 992px matches the CSS breakpoint where the hero
+            // becomes a static swipe row - below it the animation would keep
+            // writing inline transforms that fight the stylesheet.
+            if (window.innerWidth < 992) return;
+            
+            mouseInside = true;
+            
+            const rect = bannersWrapper.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const wrapperWidth = rect.width;
+            
+            // Normalize mouse X to 0-1 range
+            const normalizedX = clamp(mouseX / wrapperWidth, 0, 1);
+            
+            /**
+             * Map normalized position to banner index
+             * 
+             * normalizedX = 0.0 → focusIndex = 0 (leftmost banner)
+             * normalizedX = 0.5 → focusIndex = 2 (center banner)
+             * normalizedX = 1.0 → focusIndex = 4 (rightmost banner)
+             * 
+             * This is a FLOAT value, allowing smooth interpolation
+             * between banners (e.g., 1.3, 2.7, etc.)
+             */
+            targetFocusIndex = normalizedX * (numBanners - 1);
+            
+            // Ensure animation is running
+            startAnimation();
+        }
+        
+        /**
+         * Handle mouse leaving the hero area
+         * Smoothly return to center focus
+         */
+        function handleMouseLeave() {
+            mouseInside = false;
+            // Return focus to center
+            targetFocusIndex = 2;
+            // Keep animating to complete the transition
+            startAnimation();
+            
+            // Stop animation after transition completes
+            setTimeout(() => {
+                if (!mouseInside) {
+                    // Allow one more second of animation to settle
+                    setTimeout(() => {
+                        if (!mouseInside) {
+                            isAnimating = false;
+                        }
+                    }, 1000);
+                }
+            }, 500);
+        }
+        
+        // ===========================================
+        // INITIALIZATION
+        // ===========================================
+        
+        /**
+         * Initialize the hero interaction system
+         */
+        function initHeroInteraction() {
+            // Query banners dynamically (important for dynamic rendering)
+            banners = document.querySelectorAll('.movie-banner');
+            numBanners = banners.length;
+            
+            // Initialize banner states array
+            bannerStates = Array.from(banners).map(() => ({
+                scale: CONFIG.minScale,
+                translateY: CONFIG.minLift,
+                translateZ: CONFIG.minZ,
+                blur: CONFIG.minBlur,
+                zIndex: 50
+            }));
+            
+            // Set initial state (focus on center)
+            targetFocusIndex = 2;
+            currentFocusIndex = 2;
+            
+            // Calculate initial states
+            banners.forEach((banner, index) => {
+                bannerStates[index] = calculateBannerState(index, currentFocusIndex);
+            });
+            
+            // Apply initial transforms
+            applyBannerTransforms();
+            
+            // Remove existing listeners (if any) to prevent duplicates
+            bannersWrapper.removeEventListener('mousemove', handleMouseMove);
+            bannersWrapper.removeEventListener('mouseleave', handleMouseLeave);
+            
+            // Attach event listeners
+            bannersWrapper.addEventListener('mousemove', handleMouseMove);
+            bannersWrapper.addEventListener('mouseleave', handleMouseLeave);
+            
+            console.log('Continuous interpolation hero initialized');
+            console.log('Move cursor left <-> right to explore films');
+        }
+
+        // ===========================================
+        // MOBILE HERO CAROUSEL (TOUCH, SNAP, AUTO-ADVANCE)
+        // ===========================================
+        let mobileCarouselTimer = null;
+        let mobileCarouselResumeTimer = null;
+        let isInteractingWithCarousel = false;
+
+        function initMobileCarousel() {
+            const bannersStack = document.getElementById('bannersStack');
+            if (!bannersStack) return;
+
+            clearTimeout(mobileCarouselTimer);
+            clearTimeout(mobileCarouselResumeTimer);
+
+            // Strictly mobile / tablet only: below 992px
+            if (window.innerWidth >= 992) return;
+
+            // Accessibility: Respect reduced motion preference
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            const cards = bannersStack.querySelectorAll('.movie-banner');
+            if (cards.length <= 1) return;
+
+            function getActiveIndex() {
+                const stackRect = bannersStack.getBoundingClientRect();
+                const stackCenter = stackRect.left + stackRect.width / 2;
+                let closestIndex = 0;
+                let minDiff = Infinity;
+
+                cards.forEach((card, idx) => {
+                    const cardRect = card.getBoundingClientRect();
+                    const cardCenter = cardRect.left + cardRect.width / 2;
+                    const diff = Math.abs(stackCenter - cardCenter);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestIndex = idx;
+                    }
+                });
+                return closestIndex;
+            }
+
+            function scrollToIndex(index) {
+                if (index < 0 || index >= cards.length) return;
+                const card = cards[index];
+                const targetScrollLeft = card.offsetLeft - (bannersStack.clientWidth - card.clientWidth) / 2;
+                bannersStack.scrollTo({
+                    left: Math.max(0, targetScrollLeft),
+                    behavior: 'smooth'
+                });
+            }
+
+            function advanceToNext() {
+                if (isInteractingWithCarousel || window.innerWidth >= 992 || document.hidden) {
+                    scheduleNext(5000);
+                    return;
+                }
+
+                const currentIndex = getActiveIndex();
+                const nextIndex = (currentIndex + 1) % cards.length;
+                scrollToIndex(nextIndex);
+                scheduleNext(5000);
+            }
+
+            function scheduleNext(delay = 5000) {
+                clearTimeout(mobileCarouselTimer);
+                mobileCarouselTimer = setTimeout(advanceToNext, delay);
+            }
+
+            function pauseCarousel() {
+                isInteractingWithCarousel = true;
+                clearTimeout(mobileCarouselTimer);
+                clearTimeout(mobileCarouselResumeTimer);
+            }
+
+            function resumeCarouselAfterDelay(delay = 4000) {
+                clearTimeout(mobileCarouselResumeTimer);
+                mobileCarouselResumeTimer = setTimeout(() => {
+                    isInteractingWithCarousel = false;
+                    scheduleNext(3000);
+                }, delay);
+            }
+
+            // Bind touch, pointer, and scroll interactions to pause immediately and resume after idle
+            bannersStack.onpointerdown = pauseCarousel;
+            bannersStack.onpointerup = () => resumeCarouselAfterDelay(4000);
+            bannersStack.onpointercancel = () => resumeCarouselAfterDelay(4000);
+
+            bannersStack.ontouchstart = pauseCarousel;
+            bannersStack.ontouchmove = pauseCarousel;
+            bannersStack.ontouchend = () => resumeCarouselAfterDelay(4000);
+            bannersStack.ontouchcancel = () => resumeCarouselAfterDelay(4000);
+
+            bannersStack.onscroll = () => {
+                if (isInteractingWithCarousel) {
+                    resumeCarouselAfterDelay(4000);
+                }
+            };
+
+            // Accessibility focus events
+            bannersStack.onfocusin = pauseCarousel;
+            bannersStack.onfocusout = () => resumeCarouselAfterDelay(4000);
+
+            // Visibility changes
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    clearTimeout(mobileCarouselTimer);
+                } else if (window.innerWidth < 992 && !isInteractingWithCarousel) {
+                    scheduleNext(3000);
+                }
+            });
+
+            // Start auto-advance after initial delay
+            scheduleNext(5000);
+        }
+
+        // Screen resize handling for carousel
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                clearTimeout(mobileCarouselTimer);
+                clearTimeout(mobileCarouselResumeTimer);
+            } else {
+                initMobileCarousel();
+            }
+        });
+        
+        /**
+         * ==========================================
+         * LOAD MOVIES DATA FROM JSON
+         * ==========================================
+         */
+        
+        let allMovies = [];
+        let heroMovies = [];
+        
+        // Splash loader dismissal helper
+        function hideSplashLoader() {
+            const loader = document.getElementById('appSplashLoader');
+            if (loader) {
+                loader.classList.add('hidden');
+                setTimeout(() => {
+                    if (loader.parentNode) loader.parentNode.removeChild(loader);
+                }, 400);
+            }
+        }
+
+        // Load movies data
+        async function loadMoviesData() {
+            try {
+                const response = await (window.BookoraAPI ? BookoraAPI.fetch('/api/movies') : fetch('/api/movies'));
+                const data = await response.json();
+                
+                if (data.success && Array.isArray(data.movies) && data.movies.length > 0) {
+                    allMovies = data.movies;
+                    
+                    // Initialize hero and sections after data loads
+                    initializeHeroMovies();
+                    initializeSections();
+                    
+                    console.log('Loaded', allMovies.length, 'movies from API');
+                } else {
+                    console.error('Failed to load movies:', data.message || 'No movies returned');
+                }
+            } catch (error) {
+                console.error('Error loading movies data:', error);
+            } finally {
+                hideSplashLoader();
+            }
+        }
+        
+        // Randomly select 5 movies for hero carousel
+        function initializeHeroMovies() {
+            const shuffled = [...allMovies].sort(() => 0.5 - Math.random());
+            heroMovies = shuffled.slice(0, 5);
+            renderHeroBanners();
+        }
+        
+        // Render hero carousel banners
+        function renderHeroBanners() {
+            const bannersStack = document.getElementById('bannersStack');
+            if (!bannersStack) return;
+            
+            bannersStack.innerHTML = heroMovies.map((movie, index) => {
+                const bannerRaw = movie.banner_url || '/banners/placeholder.svg';
+                const bannerUrl = (typeof BookoraAPI !== 'undefined' && BookoraAPI.resolveImageUrl) 
+                    ? BookoraAPI.resolveImageUrl(bannerRaw) 
+                    : (bannerRaw.startsWith('/static/') ? bannerRaw.replace('/static/', '/') : bannerRaw);
+                return `
+                <div class="movie-banner" data-index="${index}">
+                    <div class="banner-image" style="background: linear-gradient(135deg, rgba(42, 37, 32, 0.4), rgba(42, 37, 32, 0.6)), url('${bannerUrl}'); background-size: cover; background-position: center;"></div>
+                    <div class="banner-content">
+                        <h3 class="banner-title">${movie.title}</h3>
+                        <p class="banner-subtitle">${(movie.description || '').substring(0, 80)}...</p>
+                        <button class="btn-book" onclick="navigateToMovie('${movie.slug}')">Book Now</button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+            
+            // Re-initialize hero interaction after DOM update
+            setTimeout(initHeroInteraction, 100);
+            setTimeout(initMobileCarousel, 150);
+        }
+        
+        /**
+         * ==========================================
+         * MOVIE SECTIONS - REAL DATA FROM JSON
+         * ==========================================
+         */
+        
+        const movieSections = {
+            recommended: [],
+            'new-releases': [],
+            'top-rated': []
+        };
+        
+        // Track current page for each section (0 = movies 1-4, 1 = movies 5-8)
+        const sectionPages = {
+            recommended: 0,
+            'new-releases': 0,
+            'top-rated': 0
+        };
+        
+        // Initialize sections with real movie data
+        function initializeSections() {
+            if (allMovies.length === 0) return;
+            
+            // Distribute movies across sections (can overlap)
+            // Recommended: First 8 movies
+            movieSections.recommended = allMovies.slice(0, 8);
+            
+            // New Releases: Movies shuffled
+            const shuffled = [...allMovies].sort(() => 0.5 - Math.random());
+            movieSections['new-releases'] = shuffled.slice(0, 8);
+            
+            // Top Rated: Last 8 movies (or different 8)
+            movieSections['top-rated'] = allMovies.length > 8 ? allMovies.slice(4, 12) : [...allMovies].slice(0, 8);
+            
+            // Render all sections
+            renderSection('recommended');
+            renderSection('new-releases');
+            renderSection('top-rated');
+        }
+        
+        // Create movie card HTML with real data
+        function createMovieCard(movie) {
+            const ratingDisplay = movie.certification || movie.rating || 'N/A';
+            const languageDisplay = Array.isArray(movie.language) ? movie.language.join(', ') : (movie.language || '');
+            const posterRaw = movie.poster_url || movie.poster || '/posters/placeholder.svg';
+            const posterUrl = (typeof BookoraAPI !== 'undefined' && BookoraAPI.resolveImageUrl) 
+                ? BookoraAPI.resolveImageUrl(posterRaw) 
+                : (posterRaw.startsWith('/static/') ? posterRaw.replace('/static/', '/') : posterRaw);
+            
+            return `
+                <div class="movie-card" onclick="navigateToMovie('${movie.slug}')">
+                    <div class="movie-poster" style="background: #2a2520 url('${posterUrl}'); background-size: cover; background-position: center;">
+                        <div class="rating-badge">
+                            <i class="fas fa-star"></i> ${ratingDisplay}
+                        </div>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-language">${languageDisplay}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Render movies for a section based on current page
+        function renderSection(sectionId) {
+            const movies = movieSections[sectionId];
+            if (!movies || movies.length === 0) return;
+            
+            const currentPage = sectionPages[sectionId];
+            
+            // Page 0 shows movies 0-3, Page 1 shows movies 4-7
+            const startIndex = currentPage * 4;
+            const endIndex = startIndex + 4;
+            const moviesToShow = movies.slice(startIndex, endIndex);
+            
+            const grid = document.getElementById(`${sectionId}-grid`);
+            if (grid) {
+                grid.innerHTML = moviesToShow.map(createMovieCard).join('');
+            }
+        }
+        
+        // Navigate section (prev/next)
+        function navigateSection(sectionId, direction) {
+            const currentPage = sectionPages[sectionId];
+            
+            if (direction === 'next' && currentPage === 0) {
+                sectionPages[sectionId] = 1; // Go to page 2 (movies 5-8)
+            } else if (direction === 'prev' && currentPage === 1) {
+                sectionPages[sectionId] = 0; // Go to page 1 (movies 1-4)
+            }
+            
+            renderSection(sectionId);
+        }
+        
+        // Navigate to movie details page
+        function navigateToMovie(movieSlug) {
+            // Navigate to movie details page (correct flow: Home → Details → Booking)
+            if (typeof BookoraRouter !== 'undefined' && BookoraRouter.buildMovieUrl) {
+                window.location.href = BookoraRouter.buildMovieUrl(movieSlug);
+            } else {
+                window.location.href = `/movie/${movieSlug}`;
+            }
+        }
+
+        // Hero banner "Book Now" buttons scroll to the live movies grid.
+        // (The hero banners are promotional artwork; the real bookable movies
+        //  are loaded dynamically into the #movies section below.)
+        function bookMovie(title) {
+            const moviesSection = document.getElementById('movies');
+            if (moviesSection) {
+                moviesSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ==========================================
+        // EVENTS MODAL FUNCTIONS
+        // ==========================================
+        
+        function openEventsModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('eventsModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+        
+        function closeEventsModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('eventsModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scroll
+        }
+        
+        function openOffersModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('offersModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scroll
+        }
+        
+        function closeOffersModal(event) {
+            event.preventDefault();
+            const modal = document.getElementById('offersModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scroll
+        }
+        
+        // ==========================================
+        // ROUTE-AWARE NAVBAR NAVIGATION
+        // ==========================================
+        
+        /**
+         * Navigate to homepage section (route-aware)
+         * - If on homepage: scroll to section
+         * - If on other page: navigate to homepage with hash, then scroll
+         */
+        function navigateToSection(sectionId, event) {
+            if (event) event.preventDefault();
+            
+            const currentPath = window.location.pathname;
+            const isHomePage = currentPath === '/' || currentPath === '/index.html';
+            
+            if (isHomePage) {
+                // Already on homepage - just scroll to section
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else {
+                // On different page - navigate to homepage with hash
+                window.location.href = `/#${sectionId}`;
+            }
+        }
+        
+        /**
+         * Navigate to homepage (logo click)
+         */
+        function navigateToHome(event) {
+            if (event) event.preventDefault();
+            window.location.href = '/';
+        }
+        
+        // ==========================================
+        // LOGO NAVIGATION - SCROLL TO TOP (for homepage)
+        // ==========================================
+        
+        function scrollToTop(event) {
+            event.preventDefault();
+            
+            const currentPath = window.location.pathname;
+            const isHomePage = currentPath === '/' || currentPath === '/index.html';
+            
+            if (isHomePage) {
+                // On homepage - scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } else {
+                // On other page - navigate to homepage
+                window.location.href = '/';
+            }
+        }
+        
+        /**
+         * Handle hash on page load (if user navigated with /#section)
+         */
+        function handleHashOnLoad() {
+            const hash = window.location.hash;
+            if (hash) {
+                setTimeout(() => {
+                    const sectionId = hash.substring(1);
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 300); // Small delay to ensure page is loaded
+            }
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const eventsModal = document.getElementById('eventsModal');
+                const offersModal = document.getElementById('offersModal');
+                
+                if (eventsModal && eventsModal.classList.contains('active')) {
+                    eventsModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                
+                if (offersModal && offersModal.classList.contains('active')) {
+                    offersModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        });
+        
+        // Check if there is a pending logout toast message from another page
+        function checkPendingLogoutToast() {
+            const logoutMsg = sessionStorage.getItem('bookora_logout_message');
+            if (logoutMsg) {
+                sessionStorage.removeItem('bookora_logout_message');
+                setTimeout(() => {
+                    if (typeof showLogoutConfirmation === 'function') {
+                        showLogoutConfirmation(logoutMsg);
+                    }
+                }, 150);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMoviesData(); // Load JSON data first
+            handleHashOnLoad(); // Handle hash navigation if present
+            checkPendingLogoutToast();
+        });
+
+        // Ensure fresh state and process pending logout if navigating back
+        window.addEventListener('pageshow', function() {
+            checkPendingLogoutToast();
+            if (typeof updateAuthUI === 'function') {
+                updateAuthUI();
+            }
+        });
+        
+        console.log('Bookora loaded - Cursor-driven hero active');
+    </script>
+    
+    <!-- Configuration & Router (MUST LOAD FIRST) -->
+    <script src="/js/config.js"></script>
+    
+    <!-- Sign-In Modal Functionality -->
+    <script src="/js/signin-modal.js"></script>
+
+</body>
+</html>

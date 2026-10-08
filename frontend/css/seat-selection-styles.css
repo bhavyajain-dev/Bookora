@@ -1,0 +1,543 @@
+/* Seat Selection Page Styles */
+
+body {
+    background-color: #faf8f5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    /* seat metrics live here so the legend swatches (also inside .container)
+       scale with the map; media queries below only re-declare these two */
+    --seat-size: 36px;
+    --seat-gap: 8px;
+    max-width: 1200px;
+    margin: 80px auto 40px auto;
+    /* bottom padding clears the fixed .booking-summary bar */
+    padding: 40px 20px 120px;
+}
+
+header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 2.5vw + 0.6rem, 2.25rem);
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2a2520;
+    overflow-wrap: break-word;
+}
+
+.show-details {
+    color: #6b6560;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.screen-container {
+    text-align: center;
+    margin: 40px 0 60px;
+}
+
+.screen {
+    display: inline-block;
+    max-width: 100%;
+    padding: 12px 60px;
+    background: linear-gradient(to bottom, #e8e3dc, #f5f2ed);
+    color: #6b6560;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 2px;
+    border-radius: 0 0 50% 50%;
+}
+
+.seats-container {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    /* A wrapped seat row stops being a seat row - "5th along" no longer means
+       seat 5. Rows keep their shape and the map scrolls sideways instead. */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+}
+
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    gap: var(--seat-gap, 8px);
+    /* min-width keeps narrow rows centred, max-content lets wide ones scroll */
+    width: max-content;
+    min-width: 100%;
+}
+
+.row-label {
+    width: 30px;
+    flex: 0 0 auto;
+    text-align: center;
+    font-weight: 600;
+    color: #2a2520;
+}
+
+.seats {
+    display: flex;
+    gap: var(--seat-gap, 8px);
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.seat {
+    width: var(--seat-size, 36px);
+    height: var(--seat-size, 36px);
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.available-seat {
+    background-color: #e8e3dc;
+    color: #2a2520;
+    border-color: #d4cdc0;
+}
+
+.available-seat:hover {
+    background-color: #d4a59a;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.selected-seat {
+    background-color: #d4a59a;
+    color: #ffffff;
+}
+
+.booked-seat {
+    background-color: #9c9590;
+    color: #ffffff;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin: 40px 0;
+    padding: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.booking-summary {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 2px solid #e8e3dc;
+    z-index: 1000;
+    /* keep the bar clear of the iOS home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.summary-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.selected-seats {
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.total-price {
+    font-size: clamp(1.25rem, 1.2vw + 0.85rem, 1.75rem);
+    font-weight: 600;
+    color: #2a2520;
+    white-space: nowrap;
+}
+
+.btn-proceed {
+    padding: 16px 40px;
+    background: #d4a59a;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-proceed:hover {
+    background: #c28f83;
+}
+
+/* ==========================================
+   BOOKING CONFIRMATION MODAL
+   ========================================== */
+
+.booking-confirm-content {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #faf8f5;
+    border-radius: 10px;
+    border: 1px solid #e8e3dc;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.booking-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e8e3dc;
+    gap: 1rem;
+}
+
+.booking-detail-row:last-child {
+    border-bottom: none;
+}
+
+.booking-detail-row.total-row {
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    border-top: 2px solid #d4a59a;
+    font-weight: 600;
+}
+
+.booking-detail-row.seats-pricing {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.seat-pricing-list {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.seat-price-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0.6rem;
+    background: #ffffff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.booking-detail-label {
+    color: #6b6560;
+    font-size: 0.9rem;
+}
+
+.booking-detail-value {
+    color: #2a2520;
+    font-weight: 500;
+    text-align: right;
+}
+
+.booking-detail-value.highlight {
+    color: #d4a59a;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.booking-confirm-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-confirm-booking {
+    flex: 1;
+    padding: 0.9rem 1.5rem;
+    background: #d4a59a;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-confirm-booking:hover {
+    background: #c28f83;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 165, 154, 0.3);
+}
+
+.btn-confirm-booking:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Success State */
+.booking-success-content {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.success-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2a2520;
+    margin-bottom: 0.5rem;
+}
+
+.success-message {
+    color: #6b6560;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Verification Loader */
+.verification-loader {
+    text-align: center;
+    padding: 2rem;
+}
+
+.verification-loader .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e8e3dc;
+    border-top-color: #d4a59a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.verification-text {
+    color: #6b6560;
+    font-size: 0.95rem;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+
+   Breakpoints mirror the shared ladder in styles.css:
+     992-1199px  small desktop
+     768-991px   tablet (Bootstrap collapses the navbar here)
+     576-767px   large phone
+     <= 575px    phone, down to 320px
+
+   This page carried no media queries at all: a 10-seat row needs ~470px of
+   width, so below ~500px the rows silently wrapped and the fixed summary bar
+   covered the legend. Seat metrics shrink here and .seats-container scrolls.
+   ========================================== */
+
+@media (max-width: 991.98px) {
+    .container {
+        /* the collapsed navbar is shorter than the desktop one */
+        margin-top: 72px;
+        padding: 2rem 1.25rem 130px;
+    }
+
+    .screen-container {
+        margin: 2rem 0 3rem;
+    }
+
+    .legend {
+        gap: 1.5rem 2rem;
+        margin: 2rem 0;
+    }
+
+    .summary-content {
+        padding: 18px 1.25rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .container {
+        --seat-size: 32px;
+        --seat-gap: 6px;
+        padding: 1.75rem 1rem 150px;
+    }
+
+    header {
+        margin-bottom: 2rem;
+    }
+
+    .show-details {
+        font-size: 0.9rem;
+    }
+
+    .screen {
+        padding: 10px 40px;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+    }
+
+    /* bleed the scroll area to the container edges so a wide seat map reads as
+       swipeable instead of looking cut off inside a padded box */
+    .seats-container {
+        margin: 0 -1rem 2rem;
+        padding: 0 1rem 6px;
+    }
+
+    .seat {
+        font-size: 11px;
+        border-width: 1px;
+    }
+
+    /* hover scaling is meaningless on touch and clipped the scrolling row */
+    .available-seat:hover {
+        transform: none;
+    }
+
+    .legend {
+        gap: 1rem 1.5rem;
+        padding: 1rem 0;
+        font-size: 0.9rem;
+    }
+
+    .summary-content {
+        padding: 1rem;
+        gap: 0.5rem 1rem;
+    }
+
+    .selected-seats {
+        flex: 1 1 auto;
+        font-size: 0.875rem;
+    }
+
+    /* price beside the seat list, button on its own full-width line:
+       a side-by-side button was squeezed under ~120px here */
+    .btn-proceed {
+        flex: 1 1 100%;
+        padding: 14px 1rem;
+        min-height: 48px;
+    }
+
+    .booking-confirm-content {
+        max-height: 45vh;
+        padding: 0.85rem;
+    }
+
+    .booking-detail-row {
+        gap: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .booking-confirm-actions {
+        margin-top: 1.25rem;
+        flex-direction: column;
+    }
+
+    .btn-confirm-booking {
+        width: 100%;
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .container {
+        --seat-size: 30px;
+        --seat-gap: 5px;
+    }
+
+    .row-label {
+        width: 22px;
+        font-size: 0.85rem;
+    }
+
+    .seat-row {
+        margin-bottom: 8px;
+    }
+
+    .screen {
+        padding: 9px 28px;
+    }
+
+    .legend-item {
+        gap: 0.5rem;
+    }
+
+    .success-icon {
+        font-size: 3rem;
+    }
+
+    .booking-success-content {
+        padding: 1.5rem 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .container {
+        /* the map already scrolls at this width, so shrinking the seat past
+           30px buys nothing but a harder tap target */
+        --seat-size: 30px;
+        --seat-gap: 4px;
+        padding: 1.5rem 0.85rem 150px;
+    }
+
+    .seats-container {
+        margin: 0 -0.85rem 1.75rem;
+        padding: 0 0.85rem 6px;
+    }
+
+    .seat {
+        font-size: 10px;
+    }
+
+    .legend {
+        gap: 0.75rem 1.1rem;
+        font-size: 0.85rem;
+    }
+
+    .summary-content {
+        padding: 0.85rem;
+    }
+
+    .seat-price-item {
+        font-size: 0.85rem;
+    }
+}

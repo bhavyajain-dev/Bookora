@@ -1,0 +1,49 @@
+name: Daily Show Maintenance
+
+on:
+  # Scheduled daily run at 00:00 IST (18:30 UTC)
+  # NOTE: GitHub Actions scheduled workflows only execute from the repository default branch (main).
+  # When deployed on feature branches, use workflow_dispatch below for manual verification.
+  schedule:
+    - cron: '30 18 * * *'
+
+  # Manual execution trigger for testing, feature branch verification, or operational backfills
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual maintenance execution'
+        required: false
+        default: 'Manual maintenance run'
+
+jobs:
+  run-show-maintenance:
+    name: Execute Show Maintenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Show Maintenance Job
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_SSL_CA_CERT: ${{ secrets.DB_SSL_CA_CERT }}
+          DB_SSL_VERIFY_CERT: ${{ secrets.DB_SSL_VERIFY_CERT }}
+        run: |
+          python scripts/run_show_maintenance.py

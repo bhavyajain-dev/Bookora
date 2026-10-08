@@ -1,0 +1,1259 @@
+/* ==========================================
+   SIGN-IN MODAL - MODERN & MINIMAL
+   ========================================== */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(42, 37, 32, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    /* Short viewports (landscape phones, 320x568) can't fit the OTP screen:
+       the overlay scrolls instead of clipping the modal. */
+    padding: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.signin-modal {
+    background: var(--bg-card);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 440px;
+    /* auto margins (not just the overlay's centering) so a modal taller than
+       the viewport stays fully scrollable instead of clipping at the top */
+    margin: auto;
+    padding: 3rem 2.5rem 3.5rem;
+    box-shadow: 0 20px 60px rgba(42, 37, 32, 0.2);
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.active .signin-modal {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition-micro);
+}
+
+.modal-close:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.modal-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.modal-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.auth-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-option-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition-gentle);
+    font-family: var(--font-body);
+}
+
+.auth-option-btn i {
+    font-size: 1.2rem;
+    color: var(--accent-pink);
+}
+
+.auth-option-btn:hover {
+    background: white;
+    border-color: var(--accent-pink);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px var(--shadow-pink);
+}
+
+.auth-option-btn:active {
+    transform: translateY(-1px);
+}
+
+.modal-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.modal-divider::before,
+.modal-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+}
+
+.modal-divider span {
+    padding: 0 1rem;
+}
+
+.modal-footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal-footer a {
+    color: var(--accent-pink);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline;
+    white-space: nowrap;
+    margin: 0 0.15em;
+}
+
+.modal-footer a:hover {
+    color: var(--accent-pink-hover);
+    text-decoration: underline;
+}
+
+/* ==========================================
+   BACK BUTTON
+   ========================================== */
+
+.modal-back {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition-micro);
+}
+
+.modal-back:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* ==========================================
+   MOBILE NUMBER INPUT SCREEN
+   ========================================== */
+
+.mobile-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.country-code-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    background: var(--bg-secondary);
+    transition: var(--transition-gentle);
+}
+
+.country-code-wrapper:focus-within {
+    border-color: var(--accent-pink);
+    background: white;
+    box-shadow: 0 0 0 3px var(--accent-pink-light);
+}
+
+.country-code {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    padding-right: 0.5rem;
+    border-right: 2px solid var(--border-light);
+}
+
+.mobile-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    color: var(--text-primary);
+    outline: none;
+    font-family: var(--font-body);
+    padding-left: 0.5rem;
+}
+
+.mobile-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Email Input Styles */
+.email-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    transition: var(--transition-gentle);
+}
+
+.email-input-wrapper:focus-within {
+    border-color: var(--accent-pink);
+    background: white;
+    box-shadow: 0 0 0 3px var(--accent-pink-light);
+}
+
+.email-icon {
+    color: var(--accent-pink);
+    font-size: 1.1rem;
+    margin-right: 0.75rem;
+}
+
+.email-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+}
+
+.email-input::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-continue {
+    background: var(--accent-pink);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-gentle);
+    font-family: var(--font-body);
+}
+
+.btn-continue:hover {
+    background: var(--accent-pink-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow-pink);
+}
+
+.btn-continue:active {
+    transform: translateY(0);
+}
+
+/* ==========================================
+   OTP INPUT SCREEN
+   ========================================== */
+
+.otp-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.otp-boxes {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.otp-box {
+    width: 50px;
+    height: 55px;
+    border: 2px solid var(--border-light);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    transition: var(--transition-fast);
+    font-family: var(--font-body);
+}
+
+.otp-box:focus {
+    outline: none;
+    border-color: var(--accent-pink);
+    background: white;
+    box-shadow: 0 0 0 3px var(--accent-pink-light);
+}
+
+.otp-box:not(:placeholder-shown) {
+    border-color: var(--accent-pink);
+    background: white;
+}
+
+.otp-timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0;
+}
+
+#timerText {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+#timerText strong {
+    color: var(--accent-pink);
+    font-weight: 700;
+}
+
+.btn-resend {
+    background: transparent;
+    color: var(--accent-pink);
+    border: 1.5px solid var(--accent-pink-soft);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: var(--font-body);
+}
+
+.btn-resend:hover:not(:disabled) {
+    background: var(--accent-pink-light);
+    border-color: var(--accent-pink);
+    transform: translateY(-2px);
+}
+
+.btn-resend:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   SCREEN TRANSITIONS
+   ========================================== */
+
+.signin-modal {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.25s ease;
+}
+
+.signin-modal.screen-transition {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+/* ==========================================
+   INLINE ERROR MESSAGE
+   ========================================== */
+
+.inline-error {
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+    border: 1px solid #fed7d7;
+    border-left: 4px solid #f56565;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #c53030;
+    animation: slideInError 0.3s ease;
+}
+
+.inline-error i {
+    font-size: 1rem;
+}
+
+.inline-error.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+@keyframes slideInError {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   VERIFYING STATE (LOADING)
+   ========================================== */
+
+.verifying-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.verifying-spinner {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+}
+
+.spinner-ring {
+    position: absolute;
+    inset: 0;
+    border: 3px solid var(--border-light);
+    border-top-color: var(--accent-pink);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;
+    color: var(--accent-pink);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.verifying-container h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.verifying-container p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ==========================================
+   SUCCESS SCREEN
+   ========================================== */
+
+.success-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 0;
+    animation: fadeInSuccess 0.4s ease;
+}
+
+@keyframes fadeInSuccess {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-icon-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1.5rem;
+}
+
+.success-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-pink-hover) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px var(--shadow-pink);
+    animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: translate(-50%, -50%) scale(0);
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.success-checkmark {
+    color: white;
+    font-size: 2rem;
+    animation: checkPop 0.4s ease 0.3s both;
+}
+
+@keyframes checkPop {
+    from {
+        opacity: 0;
+        transform: scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.success-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    border: 2px solid var(--accent-pink);
+    border-radius: 50%;
+    opacity: 0;
+    animation: ripple 1.5s ease-out infinite;
+}
+
+.success-ripple.delay-1 {
+    animation-delay: 0.3s;
+}
+
+.success-ripple.delay-2 {
+    animation-delay: 0.6s;
+}
+
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+    }
+}
+
+.success-container h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    animation: fadeInUp 0.4s ease 0.2s both;
+}
+
+.success-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.4s ease 0.3s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.signed-in-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-secondary);
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.4s ease 0.4s both;
+}
+
+.signed-in-info i {
+    color: var(--accent-pink);
+    font-size: 1rem;
+}
+
+.signed-in-info span {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.btn-explore {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-width: 200px;
+    animation: fadeInUp 0.4s ease 0.5s both;
+}
+
+.btn-explore i {
+    font-size: 1.1rem;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+
+   Breakpoints mirror the shared ladder in styles.css:
+     768-991px  tablet
+     576-767px  large phone
+     <= 575px   phone, down to 320px
+   ========================================== */
+
+@media (max-width: 767.98px) {
+    .signin-modal {
+        /* Dedicated top padding so the top action bar (modal-close / modal-back)
+           never shares vertical space with the modal header content */
+        padding: 3.5rem 1.75rem 2.5rem;
+        max-width: 90%;
+    }
+
+    .modal-header {
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.55rem;
+        overflow-wrap: break-word;
+    }
+
+    /* 44px touch target with dedicated top-bar placement */
+    .modal-close,
+    .modal-back {
+        top: 0.85rem;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.25rem;
+        z-index: 10;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .modal-close {
+        right: 0.85rem;
+    }
+
+    .modal-back {
+        left: 0.85rem;
+    }
+
+    .auth-option-btn {
+        padding: 0.9rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    .otp-boxes {
+        gap: 0.5rem;
+    }
+
+    /* Six fixed-width boxes overflow the modal below ~420px; let them shrink
+       from 50px instead (max-width keeps the desktop size as the ceiling). */
+    .otp-box {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        max-width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+
+    .success-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .success-icon-wrapper {
+        width: 90px;
+        height: 90px;
+    }
+
+    .success-circle {
+        width: 64px;
+        height: 64px;
+    }
+
+    .success-ripple {
+        width: 64px;
+        height: 64px;
+    }
+
+    .success-checkmark {
+        font-size: 1.7rem;
+    }
+
+    .verifying-spinner {
+        width: 70px;
+        height: 70px;
+    }
+
+    .spinner-icon {
+        font-size: 1.5rem;
+    }
+
+    /* scoped: .btn-explore is also the empty-state button on My Bookings */
+    .success-container .btn-explore {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .logout-toast {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        /* min-width: 320px would push past a 320px viewport */
+        min-width: 0;
+        max-width: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .signin-modal {
+        /* use the full gutter rather than losing 10% on each side */
+        width: 100%;
+        max-width: 440px;
+        /* Dedicated top padding keeps close/back buttons in their own top bar zone,
+           preventing any vertical overlap with the title or subtitle */
+        padding: 3.6rem 1.25rem 2.25rem;
+    }
+
+    .modal-close,
+    .modal-back {
+        top: 0.75rem;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .modal-close {
+        right: 0.75rem;
+    }
+
+    .modal-back {
+        left: 0.75rem;
+    }
+
+    .modal-header {
+        margin-bottom: 1.5rem;
+        padding: 0 0.25rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        line-height: 1.25;
+        overflow-wrap: break-word;
+    }
+
+    .modal-header p {
+        font-size: 0.92rem;
+        line-height: 1.45;
+        max-width: 100%;
+    }
+
+    .modal-footer {
+        margin-top: 1.75rem;
+        font-size: 0.8rem;
+    }
+
+    .otp-boxes {
+        gap: 0.35rem;
+    }
+
+    .otp-box {
+        flex: 1 1 0;
+        min-width: 0;
+        max-width: 46px;
+        height: 48px;
+        font-size: 1.15rem;
+        padding: 0;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .verifying-container,
+    .booking-success-content {
+        padding: 2rem 0.5rem;
+    }
+
+    .signed-in-info {
+        padding: 0.7rem 1rem;
+        text-align: left;
+    }
+
+    .signed-in-info span {
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 400px) {
+    .signin-modal {
+        /* Preserve dedicated top clearance so buttons never overlap */
+        padding: 3.5rem 1rem 2rem;
+        border-radius: 14px;
+    }
+
+    .modal-close,
+    .modal-back {
+        top: 0.65rem;
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        min-height: 42px;
+    }
+
+    .modal-close {
+        right: 0.65rem;
+    }
+
+    .modal-back {
+        left: 0.65rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.35rem;
+    }
+
+    .modal-header p {
+        font-size: 0.88rem;
+    }
+
+    .auth-option-btn {
+        padding: 0.85rem 0.9rem;
+        gap: 0.65rem;
+    }
+
+    .otp-boxes {
+        gap: 0.25rem;
+    }
+
+    .otp-box {
+        height: 44px;
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 340px) {
+    .signin-modal {
+        padding: 3.3rem 0.75rem 1.75rem;
+    }
+
+    .modal-close,
+    .modal-back {
+        top: 0.55rem;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .modal-close {
+        right: 0.55rem;
+    }
+
+    .modal-back {
+        left: 0.55rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal-header p {
+        font-size: 0.82rem;
+    }
+
+    .otp-boxes {
+        gap: 0.2rem;
+    }
+
+    .otp-box {
+        height: 42px;
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================
+   LOGOUT CONFIRMATION TOAST
+   ========================================== */
+
+.logout-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(42, 37, 32, 0.15);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 320px;
+    max-width: 400px;
+    z-index: 10000;
+    transform: translateY(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid var(--accent-pink);
+}
+
+.logout-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-pink-light) 0%, var(--accent-pink-soft) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-icon i {
+    color: var(--accent-pink);
+    font-size: 1.2rem;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* ==========================================
+   PROFILE COMPLETION FORM
+   ========================================== */
+
+.profile-completion-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.form-label .required {
+    color: #E74C3C;
+    margin-left: 2px;
+}
+
+.form-label .optional {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    transition: var(--transition-gentle);
+    font-family: var(--font-body);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-pink);
+    background: white;
+    box-shadow: 0 0 0 3px var(--accent-pink-light);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.phone-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--bg-secondary);
+    overflow: hidden;
+    transition: var(--transition-gentle);
+}
+
+.phone-input-wrapper:focus-within {
+    border-color: var(--accent-pink);
+    background: white;
+    box-shadow: 0 0 0 3px var(--accent-pink-light);
+}
+
+.country-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 0.75rem 0.9rem 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    border-right: 1.5px solid var(--border-light);
+    background: transparent;
+    height: 100%;
+}
+
+.phone-input-wrapper .form-input {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    flex: 1;
+    padding: 0.9rem 1rem;
+}
+
+.phone-input-wrapper .form-input:focus {
+    box-shadow: none;
+    border: none;
+}
+
+.btn-primary-bookora {
+    width: 100%;
+    padding: 0.95rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-pink) 0%, #C89B8E 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    font-family: var(--font-body);
+}
+
+.btn-primary-bookora:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 165, 154, 0.3);
+}
+
+.btn-primary-bookora:active {
+    transform: translateY(0);
+}
+
+/* ==========================================
+   SHORT VIEWPORT (LANDSCAPE PHONES)
+
+   A landscape phone is ~844x390 or ~896x414: wide enough that every
+   max-width rule above is bypassed, but only ~390px tall. The desktop
+   vertical rhythm then applies inside that short window - 104px of modal
+   padding, a 40px header margin, 60px of form padding - and pushes the
+   primary button off screen. Measured at 844x390: email entry 444px tall,
+   OTP screen 608px, profile completion 681px.
+
+   The overlay scrolls, so nothing was ever unreachable, but "Verify" and
+   "Complete Profile" sat below the fold on a screen that was mostly
+   whitespace. These rules only reclaim spacing - no colours, no layout
+   change, no element hidden - so the modal looks the same, just tighter.
+
+   .signin-modal is the shared box class for every modal in the app (sign-in,
+   booking confirm, booking details, cancel confirm), so all of them get the
+   tighter rhythm. The prefix is what keeps generic names like .form-input and
+   .form-group from also squeezing the Profile page's own forms, which live
+   outside any modal.
+   ========================================== */
+
+@media (max-height: 480px) {
+    .signin-modal {
+        padding: 2.75rem 1.5rem 1.5rem;
+    }
+
+    .signin-modal .modal-close,
+    .signin-modal .modal-back {
+        top: 0.6rem;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+    }
+
+    .signin-modal .modal-close {
+        right: 0.75rem;
+    }
+
+    .signin-modal .modal-back {
+        left: 0.75rem;
+    }
+
+    .signin-modal .modal-header {
+        margin-bottom: 1rem;
+        padding: 0 1.5rem;
+    }
+
+    .signin-modal .modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .signin-modal .modal-header p {
+        font-size: 0.88rem;
+    }
+
+    .signin-modal .modal-footer {
+        margin-top: 1rem;
+    }
+
+    /* auth choice screen */
+    .signin-modal .auth-options {
+        gap: 0.6rem;
+    }
+
+    .signin-modal .auth-option-btn {
+        padding: 0.8rem 1.2rem;
+    }
+
+    /* email entry screen */
+    .signin-modal .btn-continue {
+        padding: 0.75rem 1.5rem;
+    }
+
+    /* OTP screen - the 44px touch target on .btn-resend is preserved */
+    .signin-modal .otp-input-container {
+        gap: 1rem;
+    }
+
+    .signin-modal .otp-box {
+        height: 46px;
+        font-size: 1.3rem;
+    }
+
+    .signin-modal .otp-timer {
+        padding: 0;
+        gap: 0.5rem;
+    }
+
+    /* profile completion screen */
+    .signin-modal .profile-completion-form {
+        margin-top: 1rem;
+        padding: 0;
+        row-gap: 0.5rem;
+    }
+
+    .signin-modal .form-group {
+        margin-bottom: 0.25rem;
+    }
+
+    .signin-modal .form-input,
+    .signin-modal .country-prefix {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+
+    .signin-modal .btn-primary-bookora {
+        padding: 0.7rem 1.5rem;
+        margin-top: 0;
+    }
+}

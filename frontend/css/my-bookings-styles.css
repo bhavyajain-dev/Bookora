@@ -1,0 +1,603 @@
+/* ==========================================
+   MY BOOKINGS PAGE - BOOKORA CORAL THEME
+   ========================================== */
+
+body {
+    background-color: #faf8f5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* City Display - Match Homepage Exactly */
+.city-display {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #e8e3dc;
+    box-shadow: 0 1px 3px rgba(212, 165, 154, 0.1);
+    color: #2a2520;
+    font-weight: 500;
+}
+
+.city-display i {
+    color: #d4a59a;
+    margin-right: 0.5rem;
+}
+
+/* Spacing between city and profile section */
+.nav-item.profile-section,
+.nav-item.auth-buttons {
+    margin-left: 1.5rem;
+}
+
+.bookings-container-main {
+    max-width: 1200px;
+    margin: 100px auto 60px;
+    padding: 0 20px;
+}
+
+.bookings-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.bookings-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 2.2vw + 0.6rem, 2.25rem);
+    font-weight: 600;
+    color: #2a2520;
+    margin-bottom: 8px;
+    overflow-wrap: break-word;
+}
+
+.bookings-header p {
+    color: #6b6560;
+    font-size: 16px;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+}
+
+.loading-state i {
+    font-size: 48px;
+    color: #d4a59a;
+}
+
+.loading-state p {
+    font-size: 16px;
+    color: #6b6560;
+}
+
+/* No Bookings State */
+.no-bookings-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+}
+
+.no-bookings-state i {
+    font-size: 64px;
+    color: #e8e3dc;
+}
+
+.no-bookings-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2a2520;
+    margin-top: 12px;
+}
+
+.no-bookings-state p {
+    font-size: 16px;
+    color: #6b6560;
+    margin-bottom: 20px;
+}
+
+.btn-explore {
+    padding: 14px 28px;
+    background: #d4a59a;
+    color: #ffffff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-explore:hover {
+    background: #c89587;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 165, 154, 0.3);
+    color: #ffffff;
+}
+
+.btn-explore i {
+    font-size: 14px;
+}
+
+/* Bookings List */
+.bookings-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+/* Booking Card */
+.booking-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(42, 37, 32, 0.05);
+    border: 1.5px solid #e8e3dc;
+    transition: all 0.2s ease;
+}
+
+.booking-card:hover {
+    box-shadow: 0 4px 16px rgba(42, 37, 32, 0.1);
+}
+
+.booking-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f5f2ed;
+}
+
+.booking-status {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-confirmed {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-cancelled {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.booking-date {
+    font-size: 13px;
+    color: #9b9691;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.booking-date i {
+    font-size: 12px;
+}
+
+.booking-card-content {
+    display: grid;
+    /* minmax(0,...) so long titles/seat lists can't push the card wider */
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 24px;
+}
+
+.booking-poster {
+    width: 140px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.booking-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.booking-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.movie-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2a2520;
+    margin: 0;
+    overflow-wrap: break-word;
+}
+
+.booking-info {
+    display: grid;
+    /* min(250px, 100%) keeps the 250px track from overflowing a narrow card */
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #6b6560;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+.info-item i {
+    width: 16px;
+    flex-shrink: 0;
+    color: #d4a59a;
+    font-size: 14px;
+}
+
+.booking-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #f5f2ed;
+}
+
+.booking-price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.price-label {
+    font-size: 12px;
+    color: #9b9691;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.price-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2a2520;
+}
+
+/* Responsive rules live at the end of this file - media queries carry no extra
+   specificity, so a block placed here would lose to the plain rules below it
+   (.booking-card, .saved-movies-grid). See "RESPONSIVE DESIGN" at the bottom. */
+
+/* ==========================================
+   BOOKING DETAILS MODAL
+   ========================================== */
+
+.booking-details-content {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #faf8f5;
+    border-radius: 12px;
+    border: 1px solid #e8e3dc;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.booking-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #e8e3dc;
+}
+
+.booking-detail-item:last-child {
+    border-bottom: none;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+.detail-label {
+    color: #6b6560;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #2a2520;
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    overflow-wrap: break-word;
+}
+
+.detail-value.price {
+    color: #d4a59a;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.detail-value small {
+    display: block;
+    font-size: 0.85rem;
+    color: #6b6560;
+    margin-top: 0.25rem;
+}
+
+.booking-actions-in-modal {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-cancel-in-modal {
+    flex: 1;
+    padding: 0.9rem 1.5rem;
+    background: #d32f2f;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-in-modal:hover {
+    background: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.btn-cancel-in-modal:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Clickable booking card cursor */
+.booking-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(212, 165, 154, 0.2);
+}
+
+/* ==========================================
+   SAVED MOVIES GRID
+   ========================================== */
+
+.saved-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+/* Seat Details in Booking Modal */
+.booking-detail-item.seats-section {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.seat-details-list {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.seat-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.7rem;
+    background: #faf8f5;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border: 1px solid #e8e3dc;
+}
+
+.booking-detail-item.total-item {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 2px solid #d4a59a;
+    font-weight: 600;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   (shared by my-bookings.html and saved-movies.html)
+
+   Breakpoints mirror the shared ladder in styles.css:
+     992-1199px  small desktop
+     768-991px   tablet (Bootstrap collapses the navbar here)
+     576-767px   large phone
+     <= 575px    phone, down to 320px
+   ========================================== */
+
+@media (max-width: 991.98px) {
+    /* collapsed navbar is shorter, and its items stack instead of sitting
+       in a row - the 1.5rem left gutter only made sense horizontally */
+    .bookings-container-main {
+        margin-top: 78px;
+    }
+
+    .nav-item.profile-section,
+    .nav-item.auth-buttons {
+        margin-left: 0;
+        margin-top: 0.75rem;
+    }
+
+    .bookings-header {
+        margin-bottom: 2.25rem;
+    }
+
+    .booking-card-content {
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 20px;
+    }
+
+    .booking-poster {
+        width: 120px;
+        height: auto;
+        aspect-ratio: 2 / 3;
+    }
+
+    .booking-info {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .saved-movies-grid {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .bookings-container-main {
+        margin: 78px auto 40px;
+        padding: 0 1rem;
+    }
+
+    .booking-card {
+        padding: 20px;
+    }
+
+    .booking-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .booking-card-content {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* was width:100% + height:300px, which stretched every poster into a
+       cropped letterbox; a centred 2:3 card keeps the artwork intact */
+    .booking-poster {
+        width: 100%;
+        max-width: 150px;
+        height: auto;
+        aspect-ratio: 2 / 3;
+        margin: 0 auto;
+    }
+
+    .movie-title {
+        font-size: 20px;
+    }
+
+    .booking-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .price-value {
+        font-size: 20px;
+    }
+
+    .booking-details-content {
+        margin: 1.25rem 0;
+        padding: 1rem;
+        max-height: 50vh;
+    }
+
+    .booking-detail-item {
+        gap: 0.75rem;
+    }
+
+    .detail-label,
+    .detail-value {
+        font-size: 0.875rem;
+    }
+
+    .detail-value {
+        max-width: 60%;
+    }
+
+    /* stacked so the destructive action isn't a 100px-wide sliver */
+    .booking-actions-in-modal {
+        flex-direction: column;
+    }
+
+    .btn-cancel-in-modal {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    .saved-movies-grid {
+        gap: 1.25rem;
+        padding: 0.5rem 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* auto-fill dropped to a single full-width poster below ~370px;
+       two fixed columns keep the grid reading as a grid */
+    .saved-movies-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .booking-status {
+        font-size: 11px;
+    }
+
+    .no-bookings-state,
+    .loading-state {
+        padding: 3rem 1rem;
+    }
+
+    .no-bookings-state i {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 400px) {
+    .bookings-container-main {
+        padding: 0 0.85rem;
+    }
+
+    .booking-card {
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .booking-poster {
+        max-width: 130px;
+    }
+
+    .movie-title {
+        font-size: 18px;
+    }
+
+    .info-item {
+        font-size: 13px;
+    }
+
+    .saved-movies-grid {
+        gap: 0.75rem;
+    }
+
+    .seat-detail-row {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.5rem;
+    }
+}

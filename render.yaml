@@ -1,0 +1,87 @@
+# ==============================================================================
+# Render Blueprint Configuration — Side-by-Side Split Architecture
+# ==============================================================================
+# Defines both the standalone static frontend and the dedicated Flask backend
+# web service for Bookora.
+#
+# Target Architecture:
+#   1. bookora-frontend: Static Site (HTML/CSS/JS) with clean URL rewrites
+#   2. bookora-backend: Python Web Service (Flask/Gunicorn) with /healthz check
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. FRONTEND STATIC SITE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: bookora-frontend
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./frontend
+    routes:
+      # Dynamic path rewrites to HTML entry points
+      - type: rewrite
+        source: /movie/*
+        destination: /movie-details.html
+      - type: rewrite
+        source: /shows/*
+        destination: /shows.html
+      - type: rewrite
+        source: /seats/*
+        destination: /seat-selection.html
+
+      # Static page clean URL rewrites
+      - type: rewrite
+        source: /my-bookings
+        destination: /my-bookings.html
+      - type: rewrite
+        source: /profile
+        destination: /profile.html
+      - type: rewrite
+        source: /saved-movies
+        destination: /saved-movies.html
+
+  # ----------------------------------------------------------------------------
+  # 2. BACKEND FLASK WEB SERVICE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: bookora-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT --timeout 120 --access-logfile - --error-logfile - app:app
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: "false"
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_SSL_CA_CERT
+        sync: false
+      - key: DB_SSL_VERIFY_CERT
+        value: "true"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: EMAIL_PROVIDER
+        value: "brevo"
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_FROM_NAME
+        value: "Bookora"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: BOOKORA_CROSS_ORIGIN_PROD
+        value: "true"
+      - key: TRUST_PROXY_HEADERS
+        value: "true"

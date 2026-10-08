@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seats - Bookora</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link href="/css/styles.css" rel="stylesheet">
+    <link href="/css/signin-modal.css" rel="stylesheet">
+    <link href="/css/shows-styles.css" rel="stylesheet">
+    <link href="/css/seat-selection-styles.css" rel="stylesheet">
+</head>
+<body>
+    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-bookora" id="mainNavbar">
+        <div class="container-fluid" style="padding: 0 2rem;">
+            <a class="navbar-brand" href="/">Bookora</a>
+            
+            <button class="navbar-toggler" type="button" aria-controls="navbarContent" aria-expanded="false" aria-label="Open navigation">
+                <i class="fas fa-bars navbar-toggler-open"></i>
+                <i class="fas fa-times navbar-toggler-close"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto ms-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#movies">
+                            <i class="fas fa-film nav-icon"></i>
+                            <span>Movies</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mobile-menu-divider"></div>
+                
+                <!-- City Display -->
+                <div class="city-display" id="navbarCity">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Ahmedabad, Gujarat</span>
+                </div>
+                
+                <div class="mobile-menu-divider"></div>
+                
+                <!-- Auth State Container -->
+                <div id="authContainer" class="navbar-auth" style="display: flex; margin-left: 1.5rem;">
+                    <!-- Logged Out State -->
+                    <div id="loggedOutState" class="auth-buttons">
+                        <button class="btn-signup" onclick="openSignInModal()">Login / Signup</button>
+                    </div>
+                    
+                    <!-- Logged In State -->
+                    <div id="loggedInState" class="profile-container" style="display: none;">
+                        <div class="profile-avatar" onclick="toggleProfileDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        
+                        <!-- Profile Dropdown -->
+                        <div id="profileDropdown" class="profile-dropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="profile-name" id="profileDisplayName">User Name</div>
+                                <div class="profile-contact" id="profileDisplayContact">user@email.com</div>
+                            </div>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToProfile(event)">
+                                <i class="fas fa-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToBookings(event)">
+                                <i class="fas fa-ticket-alt"></i>
+                                <span>My Bookings</span>
+                            </a>
+                            <a href="#" class="profile-dropdown-item" onclick="navigateToSavedMovies(event)">
+                                <i class="fas fa-heart"></i>
+                                <span>Saved Movies</span>
+                            </a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="#" class="profile-dropdown-item logout-item" onclick="handleLogout(event)">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign-In Modal -->
+    <div class="modal-overlay" id="signinModal">
+        <div class="signin-modal">
+            <button class="modal-close" onclick="closeSignInModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <h2 id="signinModalTitle">Welcome to Bookora</h2>
+                <p id="signinModalSubtitle">Choose your preferred sign-in method</p>
+            </div>
+            
+            <div class="auth-options">
+                <button class="auth-option-btn" onclick="selectAuthMethod('Email')">
+                    <i class="fas fa-envelope"></i>
+                    <span>Continue with Email</span>
+                </button>
+            </div>
+            
+            <div class="modal-footer">
+                By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <header>
+            <h1 id="movieTitle"><span class="bookora-skeleton bookora-skeleton-title" style="display:inline-block; width: 280px; height: 32px; vertical-align: middle;"></span></h1>
+            <div class="show-details" id="showDetails">
+                <span class="bookora-skeleton bookora-skeleton-meta" style="display:inline-block; width: 200px; height: 18px; vertical-align: middle;"></span>
+            </div>
+        </header>
+
+        <!-- Screen Indicator -->
+        <div class="screen-container">
+            <div class="screen">SCREEN</div>
+        </div>
+
+        <!-- Seat Map -->
+        <div class="seats-container" id="seatsContainer">
+            <div class="bookora-loader-wrapper" style="min-height: 250px;">
+                <div class="bookora-spinner"></div>
+                <div class="bookora-loader-text">Loading auditorium layout and available seats...</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="seat available-seat"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="seat selected-seat"></div>
+                <span>Selected</span>
+            </div>
+            <div class="legend-item">
+                <div class="seat booked-seat"></div>
+                <span>Booked</span>
+            </div>
+        </div>
+
+        <!-- Booking Summary -->
+        <div class="booking-summary" id="bookingSummary" style="display: none;">
+            <div class="summary-content">
+                <div class="selected-seats">
+                    <span id="selectedSeatsText">No seats selected</span>
+                </div>
+                <div class="total-price">
+                    ₹<span id="totalPrice">0</span>
+                </div>
+                <button class="btn-proceed" id="proceedBtn" onclick="proceedToPayment()">
+                    Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal-overlay" id="bookingConfirmModal">
+        <div class="signin-modal">
+            <button class="modal-close" onclick="closeBookingConfirmModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <h2 id="confirmModalTitle">Confirm Your Booking</h2>
+                <p id="confirmModalSubtitle">Please review your ticket details</p>
+            </div>
+            
+            <div class="booking-confirm-content" id="bookingConfirmContent">
+                <!-- Booking details will be inserted here -->
+            </div>
+            
+            <div class="booking-confirm-actions" id="confirmActions">
+                <button class="btn-confirm-booking" id="confirmBookingBtn" onclick="confirmBooking()">
+                    Confirm Booking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/signin-modal.js"></script>
+    <script src="/js/seat-selection-script.js"></script>
+</body>
+</html>

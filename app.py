@@ -15,7 +15,7 @@ for _stream in (sys.stdout, sys.stderr):
     except (AttributeError, ValueError, OSError):  # pragma: no cover - stream without reconfigure
         pass
 
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, g
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, g, make_response
 from werkzeug.exceptions import HTTPException
 import mysql.connector
 from mysql.connector import pooling
@@ -114,21 +114,86 @@ elif SECRET_KEY.strip().lower() in _INSECURE_SECRET_KEYS and not DEBUG:
     )
 app.config['SECRET_KEY'] = SECRET_KEY
 
+# --- CORS & Allowed Origins Configuration -----------------------------------
+# Explicit origin whitelisting: comma-separated list of approved frontend origins.
+# NEVER use wildcard '*' with credentialed sessions.
+def _parse_allowed_origins():
+    raw = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000')
+    return {origin.strip().rstrip('/') for origin in raw.split(',') if origin.strip()}
+
+
 # --- Session cookie ---------------------------------------------------------
 # Flask signs the session cookie with SECRET_KEY, so the client cannot forge or
 # alter the authenticated user id - the server is the source of truth for identity.
 app.config['SESSION_COOKIE_HTTPONLY'] = True   # JS cannot read the session cookie (mitigates XSS token theft)
-app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
-# Secure-by-default: this now defaults to True whenever DEBUG is off, so a missing
-# env var can no longer silently downgrade the session cookie to plain HTTP. Local
-# HTTP development (DEBUG=True) still works, and either default can be overridden.
-app.config['SESSION_COOKIE_SECURE'] = _env_bool('SESSION_COOKIE_SECURE', not DEBUG)
+
+# SameSite & Secure:
+# When frontend and backend are on separate Render domains (*.onrender.com),
+# browsers require SameSite=None and Secure=True for cross-origin session cookies.
+# For same-site / custom domains or local monolithic, Lax is preferred.
+_is_cross_site = _env_bool('CROSS_SITE_DEPLOYMENT', False) or _env_bool('BOOKORA_CROSS_ORIGIN_PROD', False)
+_default_samesite = 'None' if _is_cross_site else 'Lax'
+_samesite_val = os.getenv('SESSION_COOKIE_SAMESITE', _default_samesite)
+app.config['SESSION_COOKIE_SAMESITE'] = _samesite_val
+
+if _samesite_val and _samesite_val.lower() == 'none':
+    # Browsers strictly reject SameSite=None without Secure=True
+    app.config['SESSION_COOKIE_SECURE'] = True
+else:
+    app.config['SESSION_COOKIE_SECURE'] = _env_bool('SESSION_COOKIE_SECURE', not DEBUG)
+
+# Optional cookie domain (do not set unless explicitly required)
+_cookie_domain = os.getenv('SESSION_COOKIE_DOMAIN', '').strip()
+if _cookie_domain:
+    app.config['SESSION_COOKIE_DOMAIN'] = _cookie_domain
+
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=int(os.getenv('SESSION_LIFETIME_DAYS', '7')))
 
 # X-Forwarded-For is client-settable, so it is only trusted when the deployment
 # explicitly declares that it sits behind a trusted reverse proxy. Otherwise a
 # single attacker could evade the per-IP OTP limits by spoofing the header.
 TRUST_PROXY_HEADERS = _env_bool('TRUST_PROXY_HEADERS', False)
+
+
+@app.before_request
+def handle_cors_preflight_and_csrf():
+    allowed_origins = _parse_allowed_origins()
+    origin = request.headers.get('Origin')
+    
+    # 1. Handle CORS preflight (OPTIONS)
+    if request.method == 'OPTIONS':
+        if origin and origin.rstrip('/') in allowed_origins:
+            response = make_response('', 204)
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-CSRF-Token, Authorization, X-Requested-With, X-Bookora-Request'
+            response.headers['Access-Control-Max-Age'] = '86400'
+            response.headers['Vary'] = 'Origin'
+            return response
+        return jsonify({'error': 'CORS preflight origin not allowed'}), 403
+
+    # 2. CSRF Origin Verification on state-changing API requests
+    if request.method in ('POST', 'PUT', 'DELETE', 'PATCH') and request.path.startswith('/api/'):
+        if origin:
+            clean_origin = origin.rstrip('/')
+            if clean_origin not in allowed_origins:
+                # In monolithic mode, Origin may match backend's own host_url
+                host_url = request.host_url.rstrip('/')
+                if clean_origin != host_url:
+                    logger.warning('CSRF rejected: Origin %s not in allowed origins or host (ip=%s)', origin, _client_ip())
+                    return jsonify({'success': False, 'message': 'Cross-origin request rejected'}), 403
+
+
+@app.after_request
+def apply_cors_and_security_headers(response):
+    allowed_origins = _parse_allowed_origins()
+    origin = request.headers.get('Origin')
+    if origin and origin.rstrip('/') in allowed_origins:
+        response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Vary'] = 'Origin'
+    return response
 
 # --- Email / OTP Transport --------------------------------------------------
 EMAIL_PROVIDER = os.getenv('EMAIL_PROVIDER', '').strip().lower()
@@ -518,7 +583,8 @@ def get_db():
         conn.ping(reconnect=True, attempts=2, delay=0)
     except mysql.connector.Error:
         try:
-            conn.close()
+            if hasattr(conn, '_cnx') and conn._cnx is not None:
+                conn.close()
         except Exception:
             pass
         conn = _get_pool().get_connection()
@@ -547,10 +613,12 @@ def _release_db_connections(exception=None):
             # transaction. Either way there is nothing to undo.
             pass
         try:
-            conn.close()
+            if hasattr(conn, '_cnx'):
+                if conn._cnx is not None:
+                    conn.close()
+            else:
+                conn.close()
         except Exception:
-            # Expected when the handler already returned it: closing a
-            # PooledMySQLConnection twice raises. Nothing to do either way.
             pass
     g._db_connections = []
 
@@ -1834,6 +1902,24 @@ def logout():
     """Clear the authenticated server-side session (server-side sign-out)."""
     session.clear()
     return jsonify({'success': True, 'message': 'Logged out successfully'}), 200
+
+@app.route('/api/auth/me', methods=['GET'])
+@login_required
+def get_auth_me():
+    """
+    Return current authenticated user profile from verified session.
+    Returns 401 if unauthenticated (enforced by @login_required).
+    Identity is derived strictly from server session; no IDOR possible.
+    """
+    return jsonify({
+        'success': True,
+        'user': {
+            'id': g.current_user['id'],
+            'name': g.current_user['name'],
+            'email': g.current_user['email'],
+            'phone': g.current_user['phone']
+        }
+    }), 200
 
 # ============================================
 # SAVED MOVIES APIs
