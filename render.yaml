@@ -83,5 +83,7 @@ services:
         sync: false
       - key: BOOKORA_CROSS_ORIGIN_PROD
         value: "true"
+      - key: BOOKORA_API_ONLY
+        value: "true"
       - key: TRUST_PROXY_HEADERS
         value: "true"

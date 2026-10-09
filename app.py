@@ -74,6 +74,13 @@ def business_now_naive():
 # ============================================
 
 DEBUG = _env_bool('DEBUG', False)
+BOOKORA_API_ONLY = _env_bool('BOOKORA_API_ONLY', False)
+app.config['BOOKORA_API_ONLY'] = BOOKORA_API_ONLY
+
+
+def _is_api_only():
+    """Return True if backend is configured to operate in API-only mode (split architecture)."""
+    return app.config.get('BOOKORA_API_ONLY', False) or _env_bool('BOOKORA_API_ONLY', False)
 
 logging.basicConfig(
     level=logging.DEBUG if DEBUG else logging.INFO,
@@ -2035,36 +2042,53 @@ def check_saved(movie_id):
         return _server_error('GET /api/check-saved')
 
 # ============================================
-# PAGE ROUTES (before catch-all)
+# PAGE ROUTES (Template / UI Rendering)
 # ============================================
+
+def _serve_page(template_name):
+    """Render an HTML page template in monolithic mode, or return JSON 404 in API-only mode."""
+    if _is_api_only():
+        return jsonify({
+            'error': 'Not Found',
+            'message': 'Page routes are disabled in API-only mode. UI is hosted separately on the frontend static service.'
+        }), 404
+    return render_template(template_name)
+
 
 @app.route('/')
 def home():
+    if _is_api_only():
+        return jsonify({
+            'service': 'Bookora API',
+            'status': 'online',
+            'mode': 'api-only',
+            'health': '/healthz'
+        }), 200
     return render_template('index.html')
 
 @app.route('/movie/<slug>')
 def movie_details(slug):
-    return render_template('movie-details.html')
+    return _serve_page('movie-details.html')
 
 @app.route('/shows/<slug>')
 def shows_page(slug):
-    return render_template('shows.html')
+    return _serve_page('shows.html')
 
 @app.route('/seats/<int:show_id>')
 def seats_page(show_id):
-    return render_template('seat-selection.html')
+    return _serve_page('seat-selection.html')
 
 @app.route('/profile')
 def profile_page():
-    return render_template('profile.html')
+    return _serve_page('profile.html')
 
 @app.route('/my-bookings')
 def my_bookings_page():
-    return render_template('my-bookings.html')
+    return _serve_page('my-bookings.html')
 
 @app.route('/saved-movies')
 def saved_movies_page():
-    return render_template('saved-movies.html')
+    return _serve_page('saved-movies.html')
 
 # ============================================
 # PROFILE APIs
@@ -2503,13 +2527,30 @@ def healthz():
     return jsonify({'status': 'ok'}), 200
 
 # ============================================
-# STATIC FILE SERVING
+# STATIC FILE SERVING & 404 HANDLER
 # ============================================
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
-    """Serve files from static folder"""
+    """Serve files from static folder in monolithic mode only."""
+    if _is_api_only():
+        return jsonify({
+            'error': 'Not Found',
+            'message': 'Static asset serving is disabled in API-only mode. Assets are hosted on the frontend service.'
+        }), 404
     return send_from_directory('static', filename)
+
+@app.errorhandler(404)
+def _handle_not_found(error):
+    """Return JSON 404 responses for API requests or when in API-only mode."""
+    if _is_api_only() or request.path.startswith('/api/'):
+        return jsonify({
+            'error': 'Not Found',
+            'message': f'The requested endpoint {request.path} was not found on this server.'
+        }), 404
+    if hasattr(error, 'get_response'):
+        return error.get_response()
+    return 'Not Found', 404
 
 # There used to be a `/<path:filename>` catch-all here that served any file in
 # the project root. It published .env, .git/config, app.py, database_schema.sql
