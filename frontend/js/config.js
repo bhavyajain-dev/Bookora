@@ -26,7 +26,7 @@
      *      - If running on a standalone static port (3000, 5500, 8080, etc.):
      *        http://<hostname>:5000
      *   4. Production cloud default:
-     *      https://bookora-backend.onrender.com (or relative if same-origin)
+     *      https://bookora-backend-t4w5.onrender.com (or relative if same-origin)
      */
     function resolveApiUrl() {
         // Explicit overrides (useful for testing or runtime environment injection)
@@ -62,7 +62,7 @@
                     return '';
                 }
                 // Target the dedicated Render backend web service
-                return 'https://bookora-backend.onrender.com';
+                return 'https://bookora-backend-t4w5.onrender.com';
             }
 
             // Default fallback for other hosted domains
@@ -84,7 +84,7 @@
     const BOOKORA_CONFIG = {
         API_URL: resolveApiUrl(),
         DEFAULT_BACKEND_PORT: 5000,
-        PRODUCTION_BACKEND_URL: 'https://bookora-backend.onrender.com',
+        PRODUCTION_BACKEND_URL: 'https://bookora-backend-t4w5.onrender.com',
         
         /**
          * Dynamically update the backend API URL at runtime.

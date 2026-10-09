@@ -129,7 +129,7 @@ class TestApiContractsAndSplitArchitecture(unittest.TestCase):
             'movie_title': 'Chhaava',
             'theatre_name': 'Rajhans',
             'theatre_address': 'Vastrapur',
-            'show_date': date(2026, 10, 8),
+            'show_date': date.today() + timedelta(days=1),
             'show_time': timedelta(seconds=68400)
         }
         mock_cursor.fetchall.return_value = [
@@ -346,7 +346,7 @@ class TestApiContractsAndSplitArchitecture(unittest.TestCase):
         # Create booking
         mock_cursor.fetchone.side_effect = [
             {'id': 1, 'name': 'User', 'email': 'u@e.com', 'phone': None}, # auth
-            {'show_date': date(2026, 10, 8), 'show_time': time(22, 0)} # show in future
+            {'show_date': date.today() + timedelta(days=1), 'show_time': time(22, 0)} # show in future
         ]
         mock_cursor.fetchall.return_value = [
             {'id': 101, 'price': 250.0, 'is_booked': 0}
@@ -368,7 +368,7 @@ class TestApiContractsAndSplitArchitecture(unittest.TestCase):
             {'id': 1, 'name': 'User', 'email': 'u@e.com', 'phone': None}, # auth
             {
                 'id': 55, 'user_id': 1, 'show_id': 10, 'seat_ids': '[101]',
-                'status': 'CONFIRMED', 'show_date': date(2026, 10, 8), 'show_time': time(22, 0)
+                'status': 'CONFIRMED', 'show_date': date.today() + timedelta(days=1), 'show_time': time(22, 0)
             }
         ]
         resp = self.client.post('/api/cancel-booking', json={'booking_id': 55}, headers={'Origin': 'http://localhost:3000'})
