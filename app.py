@@ -16,6 +16,7 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 from flask import Flask, render_template, request, jsonify, send_from_directory, session, g, make_response
+from flask.sessions import SecureCookieSessionInterface
 from werkzeug.exceptions import HTTPException
 import mysql.connector
 from mysql.connector import pooling
@@ -129,16 +130,26 @@ def _parse_allowed_origins():
     return {origin.strip().rstrip('/') for origin in raw.split(',') if origin.strip()}
 
 
-# --- Session cookie ---------------------------------------------------------
+# --- Session cookie & Partitioned CHIPS Support ------------------------------
 # Flask signs the session cookie with SECRET_KEY, so the client cannot forge or
 # alter the authenticated user id - the server is the source of truth for identity.
 app.config['SESSION_COOKIE_HTTPONLY'] = True   # JS cannot read the session cookie (mitigates XSS token theft)
 
+# Detect if running in cross-origin / cross-site mode (e.g. Render separated frontend/backend)
+_allowed_origins_set = _parse_allowed_origins()
+_has_https_origins = any(orig.startswith('https://') for orig in _allowed_origins_set)
+_is_cross_site = (
+    _env_bool('CROSS_SITE_DEPLOYMENT', False)
+    or _env_bool('BOOKORA_CROSS_ORIGIN_PROD', False)
+    or _env_bool('BOOKORA_API_ONLY', False)
+    or _has_https_origins
+)
+
 # SameSite & Secure:
 # When frontend and backend are on separate Render domains (*.onrender.com),
 # browsers require SameSite=None and Secure=True for cross-origin session cookies.
+# Modern Chrome (CHIPS) also requires the Partitioned attribute on cross-site cookies.
 # For same-site / custom domains or local monolithic, Lax is preferred.
-_is_cross_site = _env_bool('CROSS_SITE_DEPLOYMENT', False) or _env_bool('BOOKORA_CROSS_ORIGIN_PROD', False)
 _default_samesite = 'None' if _is_cross_site else 'Lax'
 _samesite_val = os.getenv('SESSION_COOKIE_SAMESITE', _default_samesite)
 app.config['SESSION_COOKIE_SAMESITE'] = _samesite_val
@@ -146,8 +157,60 @@ app.config['SESSION_COOKIE_SAMESITE'] = _samesite_val
 if _samesite_val and _samesite_val.lower() == 'none':
     # Browsers strictly reject SameSite=None without Secure=True
     app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_PARTITIONED'] = _env_bool('SESSION_COOKIE_PARTITIONED', True)
 else:
     app.config['SESSION_COOKIE_SECURE'] = _env_bool('SESSION_COOKIE_SECURE', not DEBUG)
+    app.config['SESSION_COOKIE_PARTITIONED'] = _env_bool('SESSION_COOKIE_PARTITIONED', False)
+
+# Custom session interface ensuring Partitioned attribute is serialized to Set-Cookie
+class PartitionedSecureCookieSessionInterface(SecureCookieSessionInterface):
+    """
+    Session interface with CHIPS (Cookies Having Independent Partitioned State)
+    and cross-origin SameSite=None support for modern partitioned storage in Chrome.
+    """
+    def get_cookie_partitioned(self, app):
+        return app.config.get('SESSION_COOKIE_PARTITIONED', False)
+
+    def save_session(self, app, session, response):
+        name = self.get_cookie_name(app)
+        domain = self.get_cookie_domain(app)
+        path = self.get_cookie_path(app)
+        secure = self.get_cookie_secure(app)
+        samesite = self.get_cookie_samesite(app)
+        httponly = self.get_cookie_httponly(app)
+        partitioned = self.get_cookie_partitioned(app)
+
+        if not session:
+            if session.modified:
+                response.delete_cookie(
+                    name,
+                    domain=domain,
+                    path=path,
+                    secure=secure,
+                    samesite=samesite,
+                    httponly=httponly,
+                    partitioned=partitioned,
+                )
+            return
+
+        if not self.should_set_cookie(app, session):
+            return
+
+        expires = self.get_expiration_time(app, session)
+        val = self.get_signing_serializer(app).dumps(dict(session))
+        response.set_cookie(
+            name,
+            val,
+            expires=expires,
+            httponly=httponly,
+            domain=domain,
+            path=path,
+            secure=secure,
+            samesite=samesite,
+            partitioned=partitioned,
+        )
+
+app.session_interface = PartitionedSecureCookieSessionInterface()
 
 # Optional cookie domain (do not set unless explicitly required)
 _cookie_domain = os.getenv('SESSION_COOKIE_DOMAIN', '').strip()

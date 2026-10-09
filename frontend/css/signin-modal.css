@@ -286,11 +286,65 @@
     font-size: 1rem;
     color: var(--text-primary);
     font-family: var(--font-body);
+    caret-color: var(--text-primary);
 }
 
 .email-input::placeholder {
     color: var(--text-muted);
 }
+
+/* Chrome/WebKit Autofill Override for Modal Inputs */
+.email-input:-webkit-autofill,
+.email-input:-webkit-autofill:hover,
+.mobile-input:-webkit-autofill,
+.mobile-input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 1000px #f5f2ed inset !important;
+    -webkit-text-fill-color: var(--text-primary, #2a2520) !important;
+    caret-color: var(--text-primary, #2a2520);
+    transition: background-color 50000s ease-in-out 0s;
+}
+
+.email-input-wrapper:focus-within .email-input:-webkit-autofill,
+.email-input-wrapper:focus-within .email-input:-webkit-autofill:hover,
+.email-input-wrapper:focus-within .email-input:-webkit-autofill:focus,
+.email-input-wrapper:focus-within .email-input:-webkit-autofill:active,
+.mobile-input-container:focus-within .mobile-input:-webkit-autofill,
+.mobile-input-container:focus-within .mobile-input:-webkit-autofill:hover,
+.mobile-input-container:focus-within .mobile-input:-webkit-autofill:focus,
+.mobile-input-container:focus-within .mobile-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: var(--text-primary, #2a2520) !important;
+}
+
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 1000px #f5f2ed inset !important;
+    -webkit-text-fill-color: var(--text-primary, #2a2520) !important;
+    caret-color: var(--text-primary, #2a2520);
+    transition: background-color 50000s ease-in-out 0s;
+}
+
+.form-input:-webkit-autofill:focus,
+.phone-input-wrapper:focus-within .form-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: var(--text-primary, #2a2520) !important;
+}
+
+/* Distinct theme-consistent text selection for inputs */
+.email-input::selection,
+.mobile-input::selection,
+.form-input::selection {
+    background: var(--accent-pink-soft, #e8cfc8);
+    color: var(--text-primary, #2a2520);
+}
+
+.email-input::-moz-selection,
+.mobile-input::-moz-selection,
+.form-input::-moz-selection {
+    background: var(--accent-pink-soft, #e8cfc8);
+    color: var(--text-primary, #2a2520);
+}
+
 
 .btn-continue {
     background: var(--accent-pink);

@@ -85,5 +85,12 @@ services:
         value: "true"
       - key: BOOKORA_API_ONLY
         value: "true"
+      - key: SESSION_COOKIE_SAMESITE
+        value: "None"
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: SESSION_COOKIE_PARTITIONED
+        value: "true"
       - key: TRUST_PROXY_HEADERS
         value: "true"
+

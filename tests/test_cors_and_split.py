@@ -5,6 +5,7 @@ and Frontend-Backend Split Endpoints (Phase 5).
 import unittest
 import json
 import os
+from datetime import date, timedelta
 from unittest.mock import patch, MagicMock
 
 # Ensure test execution uses predictable test origins
@@ -196,11 +197,31 @@ class TestSessionCookieConfiguration(unittest.TestCase):
         self.assertTrue(app.config.get('SESSION_COOKIE_HTTPONLY'))
 
     def test_session_cookie_samesite_none_requires_secure(self):
-        """When SameSite=None is configured, Secure is automatically enforced."""
-        # Simulated check: verify that app logic ensures Secure=True when SameSite=None
+        """When SameSite=None is configured, Secure and Partitioned are automatically enforced."""
         samesite = app.config.get('SESSION_COOKIE_SAMESITE')
         if samesite and samesite.lower() == 'none':
             self.assertTrue(app.config.get('SESSION_COOKIE_SECURE'))
+            self.assertTrue(app.config.get('SESSION_COOKIE_PARTITIONED'))
+
+    def test_set_cookie_includes_partitioned_attribute(self):
+        """Cross-site session cookie includes Partitioned attribute (CHIPS) for modern browsers."""
+        client = app.test_client()
+        with client.session_transaction() as sess:
+            sess['user_id'] = 42
+
+        # Make request to trigger session cookie generation
+        response = client.post('/api/logout', headers={'Origin': 'https://bookora.onrender.com'})
+        self.assertEqual(response.status_code, 200)
+
+        # Check Set-Cookie headers
+        set_cookies = response.headers.getlist('Set-Cookie')
+        self.assertTrue(len(set_cookies) > 0)
+        cookie_header = set_cookies[0]
+        self.assertIn('HttpOnly', cookie_header)
+        if app.config.get('SESSION_COOKIE_SAMESITE', '').lower() == 'none':
+            self.assertIn('SameSite=None', cookie_header)
+            self.assertIn('Secure', cookie_header)
+            self.assertIn('Partitioned', cookie_header)
 
     def test_logout_clears_session(self):
         """POST /api/logout clears session."""
@@ -214,5 +235,68 @@ class TestSessionCookieConfiguration(unittest.TestCase):
             self.assertNotIn('user_id', sess)
 
 
+class TestCrossSiteOtpAndBookingSessionFlow(unittest.TestCase):
+    """Test full session flow from OTP verification to booking in split cross-site architecture."""
+
+    def setUp(self):
+        self.client = app.test_client()
+        self.frontend_origin = 'https://bookora.onrender.com'
+
+    @patch('app.get_db')
+    def test_otp_verification_issues_partitioned_cookie_and_authorizes_booking(self, mock_get_db):
+        """OTP verification generates partitioned session cookie that authorizes subsequent booking."""
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_db.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+
+        # Mock OTP verification success for existing user
+        mock_cursor.fetchone.side_effect = [
+            {'id': 1},                                                    # OTP record exists
+            {'id': 42, 'name': 'Bhavya', 'email': 'bhavya@example.com', 'phone': '1234567890'}, # User exists
+            {'id': 42, 'name': 'Bhavya', 'email': 'bhavya@example.com', 'phone': '1234567890'}, # Auth check
+            {'show_date': date.today() + timedelta(days=2), 'show_time': timedelta(hours=19)},   # Show check
+        ]
+        mock_cursor.fetchall.return_value = [
+            {'id': 101, 'price': 250.0, 'is_booked': 0}                  # Seat check
+        ]
+        mock_cursor.lastrowid = 777
+
+        # 1. Verify OTP from cross-origin frontend
+        verify_resp = self.client.post(
+            '/api/verify-otp',
+            headers={'Origin': self.frontend_origin},
+            json={'email': 'bhavya@example.com', 'otp': '123456', 'type': 'email'}
+        )
+        self.assertEqual(verify_resp.status_code, 200)
+        verify_data = verify_resp.get_json()
+        self.assertTrue(verify_data['success'])
+        self.assertTrue(verify_data['userExists'])
+
+        # Check Set-Cookie on OTP response
+        set_cookies = verify_resp.headers.getlist('Set-Cookie')
+        self.assertTrue(len(set_cookies) > 0)
+        cookie_header = set_cookies[0]
+        self.assertIn('session=', cookie_header)
+        self.assertIn('HttpOnly', cookie_header)
+        if app.config.get('SESSION_COOKIE_SAMESITE', '').lower() == 'none':
+            self.assertIn('SameSite=None', cookie_header)
+            self.assertIn('Secure', cookie_header)
+            self.assertIn('Partitioned', cookie_header)
+
+        # 2. Subsequent create-booking request carrying the session
+        booking_resp = self.client.post(
+            '/api/create-booking',
+            headers={'Origin': self.frontend_origin},
+            json={'show_id': 1, 'seat_ids': [101]}
+        )
+        self.assertEqual(booking_resp.status_code, 200)
+        booking_data = booking_resp.get_json()
+        self.assertTrue(booking_data['success'])
+        self.assertEqual(booking_data['booking_id'], 777)
+
+
 if __name__ == '__main__':
     unittest.main()
+
+
